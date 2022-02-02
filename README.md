@@ -84,4 +84,9 @@ Cannot GET /
 Browser: get '/' page.
 라는 뜻인데 root 페이지('/')를 지금 열 수 없다는 뜻
 
+apt.get(routes, controller)
+
 ## Request / Response
+
+browser가 website(server)로 request를 보내고 server는 그에 대한 response를 줘야지
+response는 status code, html, .....
