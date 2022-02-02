@@ -1,13 +1,16 @@
 import express from "express";
+import morgan from "morgan";
+
 const app = express(); // express application
 
 const PORT = 4000;
 
  // 모든 routes(url)에서 동작하는 middleware 설정 가능
- // 따라서 apt.get() 보다 위에 있어야 해. 그래야 적용됨
-app.url((req, res) => { // logger
+ // 따라서 apt.get() 보다 위에 있어야 해(global) 그래야 적용됨
+app.use((req, res) => { // logger
   console.log(`${req.method} ${req.url}`);
 });
+
 // http request. app.lisen 하기 전에 설정해야 함
 // 누군가 root page로 get request를 보낸 다면 콜백함수를 실행
 app.get("/", (req, res) => {

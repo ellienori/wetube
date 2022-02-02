@@ -90,3 +90,20 @@ apt.get(routes, controller)
 
 browser가 website(server)로 request를 보내고 server는 그에 대한 response를 줘야지
 response는 status code, html, .....
+
+## Middleware
+
+middle software between request and response
+
+### morgan
+
+설치해서 쓴 예시 중에 하나
+
+```
+npm i morgan
+import morgan from "morgan";
+app.use(morgan("dev"));
+```
+
+morgan을 쓰면 middleware가 더 정교하게 표현된다.
+종류는 총 5개 combined, common, dev, short, tiny
