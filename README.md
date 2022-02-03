@@ -1,4 +1,4 @@
-# Hi
+# This is a study notion.
 
 # Set up
 
@@ -107,3 +107,57 @@ app.use(morgan("dev"));
 
 morgan을 쓰면 middleware가 더 정교하게 표현된다.
 종류는 총 5개 combined, common, dev, short, tiny
+
+```
+(Before)
+ // 모든 routes(url)에서 동작하는 middleware 설정 가능
+ // 따라서 apt.get() 보다 위에 있어야 해(global) 그래야 적용됨
+app.use((req, res) => { // logger
+  console.log(`${req.method} ${req.url}`);
+});
+
+(After)
+import morgan from "morgan";
+app.use(morgan("dev"));
+```
+
+## Router
+
+Router는 controller와 url 관리를 쉽게 해줌. 미니 어플리케이션
+
+### Plan
+
+- global router (accessible from home)
+  / -> Home
+  /join -> Join
+  /login -> Login
+  /search -> Search
+
+- users router
+  /users/:id -> See User
+  /users/logout -> Log Out
+  /users/edit -> Edit My Profile
+  /users/delete -> Delete My Profile
+
+- videos router
+  /videos/:id -> See Video :video id
+  /videos/:id/edit -> Edit Video
+  /videos/:id/delete -> Delete Video
+  /videos/upload -> Upload Video
+
+### Source code
+
+```
+(구버전)
+// http request. app.lisen 하기 전에 설정해야 함
+// 누군가 root page로 get request를 보낸 다면 콜백함수를 실행
+app.get("/", (req, res) => {
+  // req: reqeust / res: response
+  // brower가 request를 보내면 우리가 response를 보내야지
+  // request와 reponse 사이에 middleware(==handler==controller)가 있다 (middle software)
+  return res.end("Hello.");
+});
+app.get("/login", (req, res) => {
+  return res.end("Login here.");
+});
+```
