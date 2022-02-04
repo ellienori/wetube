@@ -261,3 +261,35 @@ head
 # 다른데서 가져다 쓸 때는 컨트롤러에서 변수를 보내줘야지
 res.render("home", { pageTitle: "Home ☀"}
 ```
+
+## #5.9 Mixins (pug references)
+
+반복되는 partial 같은 애야. smart partial
+mixins 디렉토리를 만들고 그 안에 video.pug 파일을 생성
+info라는 정보를 받아와서 어떻게 출력하겠다 라는 의미
+
+```
+mixin video(info)
+  div
+    h4=info.title
+    ul
+      li #{info.rating}/5
+      li #{info.comments} comments.
+      li Posted #{info.createdAt}.
+      li #{info.views} views.
+```
+
+그리고 나서 위의 파일을 include해서 view 파일에서 써야지 (home.pug)
+include도 해야하고 + 표시해서 써야함
+
+```
+extends base.pug
+include mixins/video
+
+block content
+  h1 Welcome here you will see the trending videos 🎬
+  each video in videos
+    +video(video)
+  else
+    li Sorry, nothing found ❌
+```
