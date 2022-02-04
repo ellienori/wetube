@@ -261,7 +261,3 @@ head
 # 다른데서 가져다 쓸 때는 컨트롤러에서 변수를 보내줘야지
 res.render("home", { pageTitle: "Home ☀"}
 ```
-
-## #5.7 Conditionals
-
-pug reference: conditionals, iteration, mixins

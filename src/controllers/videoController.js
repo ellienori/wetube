@@ -1,10 +1,7 @@
-const fakeUser = {
-  username: "Ellie",
-  loggedIn: true,
-}
-
-
-export const trend = (req, res) => res.render("home", { pageTitle: "Home ☀", fakeUser });
+export const trend = (req, res) => {
+  const videos = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  return res.render("home", { pageTitle: "Home ☀", videos });
+};
 export const see = (req, res) => {
   console.log(`${req.params.id}`);
   return res.render("watch", { pageTitle: "Watch" });
