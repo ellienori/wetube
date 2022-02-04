@@ -169,3 +169,91 @@ videoRouter.get("/upload", upload);
 // upload가 /:id보다 뒤에 있어버리면 express가 upload 라는 글자 자체를 id로 이해해버림!!!!
 // (\\d+) 숫자만 가져온다는 의미
 videoRouter.get("/:id(\\d+)", see);
+
+# #5 TEMPLATE
+
+## #5.0 ~ #5.1 PUG
+
+PUG: Html template helper
+우리의 express view engine으로 설정할거야
+우리가 pug file을 보내면 pug가 pug 파일을 평범한 html로 변환해서 사용자에게 제공함
+
+### Step 1. install
+
+```
+$ npm i pug
+```
+
+### Step 2. set view engine (server.js)
+
+```
+app.set("view engine", "pug");
+app.set("views", process.cwd()+"/src/views");
+```
+
+서버의 cwd (curren working directory) 수정하기
+
+-> 왜냐면 pug가 wetube/src/views/_.pug에 있는데
+자동으로 wetube/views/_.pug를 찾고있기 때문
+
+-> package.json이 실행되는 곳
+server.js에서 process.cwd() 찍어보면 정확하게 알 수 있음
+근데 package.json 어디있는 지 알잖아. wetube/package.json
+
+### Step 3. create a pug file
+
+```
+vi src/views/home.pub
+
+# pug에서 js 쓸 때는 #{} 안에 넣으면 된다.
+footer &copy; #{new Date().getFullYear()} Wetube
+```
+
+### Step 4. pug와 controller 연결 (controller.js)
+
+```
+res.render("home")
+```
+
+## #5.2~#5.3 pug partial
+
+### include
+
+partials 디렉토리에 pug 생성 후 include
+
+```
+include partials/footer.pug
+```
+
+### inheritance
+
+위에꺼도 귀찮아 겹치는 게 너무 많은데..
+base.pug를 만들고 extends 하기
+
+#### Step 1. 써먹을 base.pug 만들기
+
+```
+block content
+```
+
+#### Step 2. 필요한 곳에서 상속 받기
+
+```
+extends base.pug
+
+block content
+  h1 Home!
+```
+
+### Variables
+
+계속 비슷한 template이면 변수만 넘겨서 설정하자
+
+```
+# base.pug 에 이렇게 설정
+head
+  tite #{pageTitle} | Wetube
+
+# 다른데서 가져다 쓸 때는 컨트롤러에서 변수를 보내줘야지
+res.render("home", { pageTitle: "Home ☀"}
+```
