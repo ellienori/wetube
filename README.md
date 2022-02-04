@@ -215,7 +215,7 @@ footer &copy; #{new Date().getFullYear()} Wetube
 res.render("home")
 ```
 
-## #5.2~#5.3 pug partial
+## #5.2~#5.4 pug partial, variables
 
 ### include
 
@@ -252,8 +252,16 @@ block content
 ```
 # base.pug 에 이렇게 설정
 head
-  tite #{pageTitle} | Wetube
+  title #{pageTitle} | Wetube
+
+# 다른 string이랑 같이 쓰는 거 아니면 아래처럼도 설정 가능
+head
+  title=pageTitle
 
 # 다른데서 가져다 쓸 때는 컨트롤러에서 변수를 보내줘야지
 res.render("home", { pageTitle: "Home ☀"}
 ```
+
+## #5.7 Conditionals
+
+pug reference: conditionals, iteration, mixins
