@@ -293,3 +293,22 @@ block content
   else
     li Sorry, nothing found ❌
 ```
+
+# #6 DATABASE
+
+## #6.0~#6.1 Array DB
+
+### ES6 문법
+
+아래 두 개는 같은 의미
+
+```
+const { id } = req.params;
+const id = req.params.id;
+```
+
+### ternary operation
+
+```(watch.pug)
+#{video.views === 1 ? "view" : "views"}
+```
