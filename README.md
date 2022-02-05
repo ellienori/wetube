@@ -164,11 +164,13 @@ app.get("/login", (req, res) => {
 
 ### Parameter (#4.7~4.8)
 
+```
 // :${parameter}
 videoRouter.get("/upload", upload);
 // upload가 /:id보다 뒤에 있어버리면 express가 upload 라는 글자 자체를 id로 이해해버림!!!!
 // (\\d+) 숫자만 가져온다는 의미
 videoRouter.get("/:id(\\d+)", see);
+```
 
 # #5 TEMPLATE
 
@@ -312,3 +314,60 @@ const id = req.params.id;
 ```(watch.pug)
 #{video.views === 1 ? "view" : "views"}
 ```
+
+## #6.2~6.3 Edit
+
+### POST, GET 이해하기
+
+#### GET
+
+구글이나 네이버에 검색할 때 다음에 'search?검색어' 이런 식으로 url에 넘어가잖아
+그럴 때 GET을 쓰는 거임
+그리고 얘는 default라 따로 method 설정 안해주면 get으로 되어 있음
+
+wetube에서는 비디오 검색할 때 사용
+
+#### POST
+
+파일을 보내거나 DB에 있는 값을 바꾸는(수정/삭제) 뭔가를 보낼 때 사용
+로그인 할 때도 사용
+
+```(edit.pug)
+form(method="POST")
+```
+
+하지만 저렇게 선언한다고 해서 우리 서버가 이해하고 있는 거 아니니까
+router에도 알려줘야해
+
+```(videoRouter.js)
+videoRouter.get("/:id(\\d+)/edit", getEdit);
+videoRouter.post("/:id(\\d+)/edit", postEdit);
+```
+
+근데 위에서 처럼 두 줄로 쓰지말고 아래처럼 하나로
+
+```
+videoRouter.route("/:id(\\d+)/edit").get(getEdit).post(postEdit);
+```
+
+##### express가 form을 이해하게 하려면
+
+```(server.js)
+app.use(express.urlencoded({extended: true}));
+```
+
+router 연결되기 전에 적어야함
+저래야 form의 value를 이해할 수 있음
+
+```(videoController.js의 postEdit 함수)
+console.log(req.body);
+```
+
+그럼 이제 form에 적은 내용이 넘어옴
+form의 name이 title이기 때문에 콘솔창에 데이터가
+
+```
+{ title: 'New Video' }
+```
+
+라고 넘어옴
