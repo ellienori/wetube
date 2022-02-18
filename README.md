@@ -358,6 +358,7 @@ app.use(express.urlencoded({extended: true}));
 
 router 연결되기 전에 적어야함
 저래야 form의 value를 이해할 수 있음
+form을 javascript가 이해할 수 있도록 변환해주는 middleware임
 
 ```(videoController.js의 postEdit 함수)
 console.log(req.body);
@@ -371,3 +372,18 @@ form의 name이 title이기 때문에 콘솔창에 데이터가
 ```
 
 라고 넘어옴
+
+## #6.4 Recap
+
+### videoController postEdit 이해하기
+```
+export const postEdit = (req, res) => {
+  const { id } = req.params;
+  const { title } = req.body;
+  videos[id-1].title = title;
+  return res.redirect(`/videos/${id}`);
+};
+```
+- req.params는 router의 "/:id(\\d+)" 를 의미함
+- req.body는 form(edit.pug)에 있는 value의 javascript representation이다.
+req.body에서 데이터보려면 edit.pug에서 input에 꼭 name 넣어줘야해
