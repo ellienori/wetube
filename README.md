@@ -450,9 +450,45 @@ mongoose.connect("mongodb://127.0.0.1:27017/wetube"); // url 뒤에 database 이
 import "./db";
 ```
 
-- db 연결
+- db 연결 ~ on과 once 차이
 ```
 const db = mongoose.connection;
 db.on("error", (error) => console.log("DB Error", error)); // many times
 db.once("open", () => console.log("Connected to DB ✅")); // only one time
+```
+
+## #6.8~ CRUD
+Create
+Read
+Update
+Delete
+
+Video model을 만들거야 (mkdir models > vi Video.js)
+mongoose에게 데이터가 어떻게 생겼는지 가르쳐줘야해
+
+### 스키마
+```
+const videoSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  createdAt: Date,
+  hashtags: [{ type: String }], // array
+  meta: {
+    views: Number,
+    rating: Number,
+  },
+});
+```
+데이터 형태가 어떻게 생겼는지 설정한다.
+
+#### 모델 생성
+위에서 생성한 스키마를 기반으로 모델을 생성한다.
+```
+const movieModel = mongoose.model("Video", videoSchema); // model 이름을 Video로 함
+export default movieModel; // export
+```
+
+그리고 서버(server.js)에 import 해줘야 함
+```
+import "./models/Video";
 ```
