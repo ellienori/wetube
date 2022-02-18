@@ -387,3 +387,72 @@ export const postEdit = (req, res) => {
 - req.params는 router의 "/:id(\\d+)" 를 의미함
 - req.body는 form(edit.pug)에 있는 value의 javascript representation이다.
 req.body에서 데이터보려면 edit.pug에서 input에 꼭 name 넣어줘야해
+
+## #6.7 MongoDB
+
+### 설명
+- document-based 임 => objects(json like documents)
+- 만약 sql-based 였다면 rdb였겠지 엑셀처럼 column/rows (not flexible)
+
+### 설치
+https://docs.mongodb.com/manual/installation
+
+MongoDB 설치 (MacOS용)
+1. xcode-select --install
+2. brew tap mongodb/brew
+3. brew install mongodb-community@5.0
+(버전은 추후에 달라질 수 있습니다.)
+
+MongoDB Compass (MongoDB GUI)
+https://www.mongodb.com/products/compass
+
+
+### 설치 확인
+terminal 열어서
+```
+$ mongod
+$ mongo
+```
+
+문제 발생했을 경우
+```
+MongoDB shell version v5.0.0
+connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
+Error: couldn't connect to server 127.0.0.1:27017, connection attempt failed: SocketException: Error connecting to 127.0.0.1:27017 :: caused by :: Connection refused :
+connect@src/mongo/shell/mongo.js:372:17
+@(connect):2:6
+exception: connect failed
+exiting with code 1
+-----------------------------------
+이렇게 뜨면
+인텔맥: mongod --config /usr/local/etc/mongod.conf --fork
+M1: mongod --config /opt/homebrew/etc/mongod.conf --fork
+```
+
+## #6.8 Mongoose
+
+nodejs랑 mongoDB 연결하게 도와주는 애
+
+### 설치
+npm i mongoose
+
+### setting
+- db.js 생성
+- $ mongo 명령어 후 url 가져오기: mongodb://127.0.0.1:27017/
+- db.js에 mongoose랑 mongoDB 연결하기
+```
+import mongoose from "mongoose";
+
+mongoose.connect("mongodb://127.0.0.1:27017/wetube"); // url 뒤에 database 이름
+```
+- 서버(server.js)에서 연결
+```
+import "./db";
+```
+
+- db 연결
+```
+const db = mongoose.connection;
+db.on("error", (error) => console.log("DB Error", error)); // many times
+db.once("open", () => console.log("Connected to DB ✅")); // only one time
+```
