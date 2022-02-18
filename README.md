@@ -492,3 +492,55 @@ export default movieModel; // export
 ```
 import "./models/Video";
 ```
+
+## #6.11~ Query
+
+### server.js와 init.js 분리
+server.js는 express 관련된 것과 server의 configuration에 관련된 내용만 다루고
+init.js는 DB나 model등을 import하는 내용을 담음
+``` // init.js
+import "./db";
+import "./models/Video";
+import app from "./server";
+
+const PORT = 4000;
+
+// Set a server
+app.listen(PORT, () => { // create a server
+  console.log(`Server listening on http://localhost:${PORT} 🚀`);
+});
+```
+nodemon 설정을 위해 server.js를 실행시키는 부분을 init.js로 바꾸기
+
+### Model 사용
+이제 controller에서 fake data(array) 다 지우고
+../models/Video를 import 한 다음 사용하면 된다. 
+
+#### Model.find()
+Model.find()은 callback 함수로 쓸 수도 있고 promise로 쓸 수 있는데 우선 cb로 이해하자.
+우선 모든 비디오 데이터를 가지고 오는 것이 목표
+
+mongoose는 Video.find({}, // 여기에서 이미 db를 가지고 올거고
+그 db가 바응하면 뒤의 function을 실행시킬 거야.
+```
+Video.find({}, (err, videos) => {
+    
+  });
+```
+앞의 {}은 search terms를 의미하는데 얘가 비어있으면 모든 형식을 찾는다는 것을 의미
+
+#### callback이랑 promise 비교
+``` // callback
+export const home = (req, res) => {
+  Video.find({}, (err, videos) => {
+    return res.render("home", { pageTitle: "Home ☀", videos });
+  });
+};
+```
+
+``` // promise
+export const home = async (req, res) => {
+  const videos = await Video.find({});
+  return res.render("home", { pageTitle: "Home ☀", videos });
+};
+```
