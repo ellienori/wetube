@@ -654,3 +654,38 @@ const video = new Video({
   ```
   videoRouter.get("/:id([0-9a-f]{24})", watch);
   ```
+
+  ## #6.20~ Edit Video
+
+  ### postEdit
+  기존
+  ```
+  video.title = title;
+  video.description = description;
+  video.hashtags = hashtags.split(",")
+  .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
+  await video.save();
+  ```
+  New
+  ```
+  await Video.findByIdAndUpdate(id, {
+    title,
+    description,
+    hashtags: hashtags
+      .split(",")
+      .map((word) => word.startsWith("#") ? word : `#${word}`),
+  });
+  ```
+
+  ### id로 데이터 오브젝트 찾을 때
+  지금 우리 코드는 매번 오브젝트 전체를 불러오는데 
+  ```
+  const video = await Video.findById(id);
+  ```
+  이럴 필요 없이 존재 유무만 먼저 판단하는 것이 더 좋다.
+  Model.exists()는 인자로 filter를 받기 때문에 조건을 넣어줌
+  결과는 true of false
+  (참고) postEdit에선ㄴ 이렇게 쓰지만 getEdit에서는 object를 직접 가져와야 함
+  ```
+  const video = await Video.exists({_id: id});
+  ```
