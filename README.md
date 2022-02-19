@@ -544,3 +544,95 @@ export const home = async (req, res) => {
   return res.render("home", { pageTitle: "Home ☀", videos });
 };
 ```
+
+## #6.16
+video.save(); 에서 save는 promise를 리턴하기 때문에 save 작업이 끝날 때까지 기다려야 함
+
+### DB 확인하기 (MongoDB에서)
+```
+> show dbs;
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+wetube  0.000GB
+> use wetube
+switched to db wetube
+> show collections
+videos
+> help
+	db.help()                    help on db methods
+	db.mycoll.help()             help on collection methods
+	sh.help()                    sharding helpers
+	rs.help()                    replica set helpers
+	help admin                   administrative help
+	help connect                 connecting to a db help
+	help keys                    key shortcuts
+	help misc                    misc things to know
+	help mr                      mapreduce
+
+	show dbs                     show database names
+	show collections             show collections in current database
+	show users                   show users in current database
+	show profile                 show most recent system.profile entries with time >= 1ms
+	show logs                    show the accessible logger names
+	show log [name]              prints out the last segment of log in memory, 'global' is default
+	use <db_name>                set current database
+	db.mycoll.find()             list objects in collection mycoll
+	db.mycoll.find( { a : 1 } )  list objects in mycoll where a == 1
+	it                           result of the last line evaluated; use to further iterate
+	DBQuery.shellBatchSize = x   set default number of items to display on shell
+	exit                         quit the mongo shell
+> db.videos.find()
+{ "_id" : ObjectId("6210c47fa5610cae69ba8571"), "title" : "First trial", "description" : "This is a first video.", "createdAt" : ISODate("2022-02-19T10:20:47.154Z"), "hashtags" : [ "#first", "#video", "#nice" ], "meta" : { "views" : 0, "rating" : 0 }, "__v" : 0 }
+```
+
+### DB 저장하기 save -> create
+기존 방법
+```
+const video = new Video({
+    title,
+    description,
+    createdAt: Date.now(),
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+    hashtags: hashtags.split(",")
+      .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
+  });
+  
+  await video.save();
+  ```
+
+  새 방법
+  ```
+  await Video.create({
+    title,
+    description,
+    createdAt: Date.now(),
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+    hashtags: hashtags.split(",")
+      .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
+  });
+  ```
+
+  ## #6.17
+
+  ### Model에서 값 required로 하기
+  기존
+  ```
+  createdAt: Date,
+  ```
+  새 방법
+  ```
+  createdAt: { type: Date, required: true },
+  ```
+
+  ### Model에서 default 정하기
+  ```
+  createdAt: { type: Date, required: true, default: Date.now },
+  ```
+  Date.now()로 하면 즉시 실행되는 것 주의
