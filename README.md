@@ -636,3 +636,21 @@ const video = new Video({
   createdAt: { type: Date, required: true, default: Date.now },
   ```
   Date.now()로 하면 즉시 실행되는 것 주의
+
+  ## #6.19 Video detail
+
+  ### 정규식
+  정규식 연습할 수 있는 사이트 https://regex101.com/
+  정규식에 대한 MDN의 공식 문서 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
+
+  기존에 라우터에서 id가 숫자라 생각해서 숫자로 정규식표현 해놨는데 
+  ```
+  videoRouter.get("/:id(\\d+)", watch);
+  ```
+  이제 mongoDB에서 생성해주는 string id 값이니까 수정해줘야함
+
+  mongoDB에서 생성하는 id는 16진수 24글자 string
+  [0-9a-f]{24}
+  ```
+  videoRouter.get("/:id([0-9a-f]{24})", watch);
+  ```
