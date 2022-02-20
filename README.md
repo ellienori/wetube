@@ -853,3 +853,15 @@ if (exists) {
   return res.render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
 }
 ```
+
+## #7.4 Status codes
+우리가 잘못된 username/password를 입력해서 join이 실패해도 
+```
+POST /join 200 50.066 ms - 910
+```
+status code 200을 보내서 브라우저는 가입이 성공한 줄 알고 username/password를 저장할 거냐고 묻는다.
+그래서 우리는 가입이 성공했을 때만 200을 보내기로 할거야.
+Bad request 400
+```
+return res.status(400).render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
+```
