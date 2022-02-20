@@ -797,3 +797,15 @@ new RegExp(`^${keyword}`, "i")
 
 keyword로 끝나는 애를 찾고 싶으면
 new RegExp(`${keyword}$`, "i")
+
+# #7 User Authentication
+
+## #7.0~ Create account
+
+### Setting
+models/User.js 생성
+init에서 import User
+
+rootRouter에 join 관련 route 추가
+userController에 join 관련 컨트롤러 추가 (postJoin, getJoin)
+join.pug view 생성
