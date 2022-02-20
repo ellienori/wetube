@@ -590,102 +590,117 @@ videos
 기존 방법
 ```
 const video = new Video({
-    title,
-    description,
-    createdAt: Date.now(),
-    meta: {
-      views: 0,
-      rating: 0,
-    },
-    hashtags: hashtags.split(",")
-      .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
-  });
-  
-  await video.save();
-  ```
+  title,
+  description,
+  createdAt: Date.now(),
+  meta: {
+    views: 0,
+    rating: 0,
+  },
+  hashtags: hashtags.split(",")
+    .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
+});
 
-  새 방법
-  ```
-  await Video.create({
-    title,
-    description,
-    createdAt: Date.now(),
-    meta: {
-      views: 0,
-      rating: 0,
-    },
-    hashtags: hashtags.split(",")
-      .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
-  });
-  ```
+await video.save();
+```
 
-  ## #6.17
+새 방법
+```
+await Video.create({
+  title,
+  description,
+  createdAt: Date.now(),
+  meta: {
+    views: 0,
+    rating: 0,
+  },
+  hashtags: hashtags.split(",")
+    .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`),
+});
+```
 
-  ### Model에서 값 required로 하기
-  기존
-  ```
-  createdAt: Date,
-  ```
-  새 방법
-  ```
-  createdAt: { type: Date, required: true },
-  ```
+## #6.17
 
-  ### Model에서 default 정하기
-  ```
-  createdAt: { type: Date, required: true, default: Date.now },
-  ```
-  Date.now()로 하면 즉시 실행되는 것 주의
+### Model에서 값 required로 하기
+기존
+```
+createdAt: Date,
+```
+새 방법
+```
+createdAt: { type: Date, required: true },
+```
 
-  ## #6.19 Video detail
+### Model에서 default 정하기
+```
+createdAt: { type: Date, required: true, default: Date.now },
+```
+Date.now()로 하면 즉시 실행되는 것 주의
 
-  ### 정규식
-  정규식 연습할 수 있는 사이트 https://regex101.com/
-  정규식에 대한 MDN의 공식 문서 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
+## #6.19 Video detail
 
-  기존에 라우터에서 id가 숫자라 생각해서 숫자로 정규식표현 해놨는데 
-  ```
-  videoRouter.get("/:id(\\d+)", watch);
-  ```
-  이제 mongoDB에서 생성해주는 string id 값이니까 수정해줘야함
+### 정규식
+정규식 연습할 수 있는 사이트 https://regex101.com/
+정규식에 대한 MDN의 공식 문서 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
 
-  mongoDB에서 생성하는 id는 16진수 24글자 string
-  [0-9a-f]{24}
-  ```
-  videoRouter.get("/:id([0-9a-f]{24})", watch);
-  ```
+기존에 라우터에서 id가 숫자라 생각해서 숫자로 정규식표현 해놨는데 
+```
+videoRouter.get("/:id(\\d+)", watch);
+```
+이제 mongoDB에서 생성해주는 string id 값이니까 수정해줘야함
 
-  ## #6.20~ Edit Video
+mongoDB에서 생성하는 id는 16진수 24글자 string
+[0-9a-f]{24}
+```
+videoRouter.get("/:id([0-9a-f]{24})", watch);
+```
 
-  ### postEdit
-  기존
-  ```
-  video.title = title;
-  video.description = description;
-  video.hashtags = hashtags.split(",")
-  .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
-  await video.save();
-  ```
-  New
-  ```
-  await Video.findByIdAndUpdate(id, {
-    title,
-    description,
-    hashtags: hashtags
-      .split(",")
-      .map((word) => word.startsWith("#") ? word : `#${word}`),
-  });
-  ```
+## #6.20~ Edit Video
 
-  ### id로 데이터 오브젝트 찾을 때
-  지금 우리 코드는 매번 오브젝트 전체를 불러오는데 
-  ```
-  const video = await Video.findById(id);
-  ```
-  이럴 필요 없이 존재 유무만 먼저 판단하는 것이 더 좋다.
-  Model.exists()는 인자로 filter를 받기 때문에 조건을 넣어줌
-  결과는 true of false
-  (참고) postEdit에선ㄴ 이렇게 쓰지만 getEdit에서는 object를 직접 가져와야 함
-  ```
-  const video = await Video.exists({_id: id});
-  ```
+### postEdit
+기존
+```
+video.title = title;
+video.description = description;
+video.hashtags = hashtags.split(",")
+.map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
+await video.save();
+```
+New
+```
+await Video.findByIdAndUpdate(id, {
+  title,
+  description,
+  hashtags: hashtags
+    .split(",")
+    .map((word) => word.startsWith("#") ? word : `#${word}`),
+});
+```
+
+### id로 데이터 오브젝트 찾을 때
+지금 우리 코드는 매번 오브젝트 전체를 불러오는데 
+```
+const video = await Video.findById(id);
+```
+이럴 필요 없이 존재 유무만 먼저 판단하는 것이 더 좋다.
+Model.exists()는 인자로 filter를 받기 때문에 조건을 넣어줌
+결과는 true of false
+(참고) postEdit에선ㄴ 이렇게 쓰지만 getEdit에서는 object를 직접 가져와야 함
+```
+const video = await Video.exists({_id: id});
+```
+
+## #6.23 Mongoose middlewares
+Model에서 설정할거니까 Video.js에서 확인할 것
+
+middleware는 model이 생성되기 전에 설정되어야 함
+middleware 안에 넘기는 함수에서 this는 document를 의미함
+즉 내가 새 비디오를 업로드하면 새 비디오 데이터가 this에 들어가있음
+pre.('save') 즉 save 전(previous)에 동작하는 미들웨어라는 뜻
+```
+videoSchema.pre('save', async function() {
+  // this refers to the document
+});
+
+const movieModel = mongoose.model("Video", videoSchema);
+```
