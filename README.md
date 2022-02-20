@@ -736,3 +736,27 @@ videoSchema.static('formatHashtags', function(hashtags) {
           .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
 });
 ```
+
+## #6.25 Delete video
+
+### Step 1. Watch page에 delete 버튼 추가
+```
+a(href=`${video.id}/delete`) Delete Video &rarr;
+```
+
+### Step 2. Router와 Controller에 Delete 함수 추가
+```
+// Router
+// 그런데  Router에서 deleteVideo 쓰려면 controller에 미리 생성되어 있어야 함
+videoRouter.route("/:id([0-9a-f]{24})/delete").get(deleteVideo);
+
+// Controller
+export const deleteVideo = async (req, res) => {
+  const { id } = req.params;
+  await Video.findByIdAndDelete(id);
+  return res.redirect("/");
+}
+```
+
+#### 그런데 findByIdAndDelete와 Remove의 차이점이 뭐야?
+별로 차이 없는데 remove는 롤백이 안되서 다시 되돌릴 수 없기 때문에 delete 사용을 권장함
