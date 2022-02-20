@@ -809,3 +809,47 @@ init에서 import User
 rootRouter에 join 관련 route 추가
 userController에 join 관련 컨트롤러 추가 (postJoin, getJoin)
 join.pug view 생성
+
+### password hashing
+해싱은 한방향이라서 1212 -> sdfdf가 된다고 해서 sdfdf -> 1212가 되는 거 아님
+같은 input으로는 항상 같은 output이 나옴 == deterministic function 결정 함수
+
+```
+npm i bcrypt
+```
+
+rainbow table 공격을 막기 위해 salt를 함께 넣을 거야
+```
+// User.js
+import bcrypt from "bycrpt";
+
+userSchema.pre('save', async function() {
+  this.password = await bcrypt.hash(this.password, 5);
+});
+```
+middleware로 저장하기 전에 password를 hashing하기
+bcrypt.hasy(데이터, 횟수, 콜백함수) 하지만 우린 async await라 콜백함수 X
+
+## #7.3 Form validation
+### Unique 값 처리하기
+기존
+```
+// username and email should be unique.
+const usernameExists = await User.exists({username});
+if (usernameExists) {
+  return res.render("join", { pageTitle: "Join", errorMessage: "This username is already taken."});
+}
+const emailExists = await User.exists({email});
+if (emailExists) {
+  return res.render("join", { pageTitle: "Join", errorMessage: "This email is already taken."});
+}
+```
+
+after
+```
+// username and email should be unique.
+const exists = await User.exists({$or: [{username}, {email}]});
+if (exists) {
+  return res.render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
+}
+```
