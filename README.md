@@ -704,3 +704,35 @@ videoSchema.pre('save', async function() {
 
 const movieModel = mongoose.model("Video", videoSchema);
 ```
+근데 얘는 upload에서는 먹히는데 edit에서 안먹혀
+왜냐면 findoneandupdate에서는 this로 document에 접근할 수 없기 때문이야
+
+## #6.24 statics
+
+### hashtags를 함수로 처리하는 방법
+```
+// Model
+export const formatHashtags = (hashtags) => hashtags.split(",")
+.map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
+
+// Controller
+import Video, { formatHashtags } from "../models/Video";
+
+await Video.findByIdAndUpdate(id, {
+    title,
+    description,
+    hashtags: formatHashtags(hashtags),
+  });
+```
+
+### Statics로 처리하는 방법
+static은 Model에서 쓸 수 있는 함수를 생성해주는 거야
+그래서 schema.static(함수 이름, 함수) 형태로 되어 있음
+사용은 Video.formatHashtags(hashtags)
+```
+videoSchema.static('formatHashtags', function(hashtags) {
+  return hashtags
+          .split(",")
+          .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
+});
+```

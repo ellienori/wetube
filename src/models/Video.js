@@ -11,11 +11,10 @@ const videoSchema = new mongoose.Schema({
   },
 });
 
-videoSchema.pre('save', async function() {
-  // this refers to the document
-  this.hashtags = this.hashtags[0].split(",")
-                          .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
+videoSchema.static('formatHashtags', function(hashtags) {
+  return hashtags
+          .split(",")
+          .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
 });
-
 const movieModel = mongoose.model("Video", videoSchema); // Model 이름을 Video로 함
 export default movieModel;
