@@ -760,3 +760,40 @@ export const deleteVideo = async (req, res) => {
 
 #### 그런데 findByIdAndDelete와 Remove의 차이점이 뭐야?
 별로 차이 없는데 remove는 롤백이 안되서 다시 되돌릴 수 없기 때문에 delete 사용을 권장함
+
+## #6.26~ search
+
+### home에서 출력되는 이미지 sort
+```
+const videos = await Video.find({}).sort({createdAt: -1});
+```
+
+### search page
+search page를 만든다면 어디에 설정해야할까? -> global router
+
+#### 1. setting
+global router에 search 추가, video controller에 search 생성
+search 뷰 추가 - 그 전에 base.pug에 search로 가는 메뉴도 추가
+
+#### 2. regex
+정확하게 keyword랑 title이 일치해야 나옴
+```
+videos = await Video.find({
+  title: keyword,
+});
+```
+따라서 regex 쓰기
+```
+videos = await Video.find({
+  title: {
+    $regex: new RegExp(keyword, "i"),
+  },
+});
+```
+"i"는 대소문자를 구분하지 않음을 의미 (모두 검색)
+
+만약에 keyword로 시작하는 애를 찾고 싶으면
+new RegExp(`^${keyword}`, "i")
+
+keyword로 끝나는 애를 찾고 싶으면
+new RegExp(`${keyword}$`, "i")
