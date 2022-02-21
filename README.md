@@ -988,3 +988,31 @@ app.use(session({
   store: MongoStore.create({mongoUrl: "mongodb://127.0.0.1:27017/wetube"}),
 }));
 ```
+
+## #7.13 Uninitialized Sessions
+```
+app.use(session({
+  secret: "Hello!",
+  resave: true,
+  saveUninitialized: true,
+  store: MongoStore.create({mongoUrl: "mongodb://127.0.0.1:27017/wetube"}),
+}));
+```
+여기서 의미하는 resave와 saveUninitialized => 모두 false로 변경
+
+join하지 않고 구경하는 모든 사람의 세션을 다 DB에 저장? 좋은 생각 아님
+로그인 한 사용자의 session만 DB에 저장하도록 하자
+
+### saveUninitialized
+우리가 세션을 이니셜라이즈 할 때는 로그인 할 때 뿐임
+```
+// login
+req.session.loggedIn = true;
+req.session.user = user;
+```
+
+세션을 수정할 때만 DB에 저장하고 쿠키를 넘겨준다.
+backend가 로그인한 사용자에게만 쿠키를 주도록 설정한다. (익명에게는 쿠키 안줌)
+
+backend가 DB에 저장하는 게 session 인증의 문제점 중 하나
+해결책: token authentication (cookie 없을 때는 token을 사용)
