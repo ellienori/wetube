@@ -866,7 +866,7 @@ Bad request 400
 return res.status(400).render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
 ```
 
-## #7.6~ Login
+## #7.5~ Login
 사용자가 입력한 password와 db에 hashed password가 같은지 비교하기
 ```
 const ok = await bcrypt.compare(password, user.password);
@@ -877,4 +877,91 @@ if (!ok) {
       errorMessage: "Wrong password.",
     });
 }
+```
+
+## #7.7~ Sessions and Cookies
+
+### 쿠키?
+유저를 기억하는 방법 중 한 가지는 유저에게 쿠키를 보내주는 것
+쿠키를 이해하기 위해서는 세션에 대해 알아야 해
+쿠키? 단지 정보를 주고받는 방법
+
+### 세션?
+session id는 쿠키에 저장되고 backend에도 저장 된다.
+
+백엔드와 브라우저 사이에 어떤 활동을 했는지를 기억하는 것
+백엔드와 브라우저 사이의 memory, history
+이게 작동하려면 백엔드와 브라우저가 서로에 대한 정보를 갖고있어야 함
+
+로그인 페이지에서 http 요청을 하면 요청이 처리 되고 끝남
+그 이후로는 백엔드가 아무 것도 할 수 없어
+
+내가 home을 누르면 get 요청(request)를 보냄
+백엔드가 html을 render하고 나면 연결이 끝남
+연결이 계속 유지되지 않음. state가 없음
+
+그래서 유저가 로그인 할 때마다 누군지 알 수 있도록 텍스트 같은 걸 줄 거야
+
+### express-session
+- 설치
+```
+npm i express-session
+```
+
+- 설정
+```
+import session from "express-session";
+// router 앞에 초기화 해주기
+app.use(session({
+  secret: "Hello!",
+  resave: true,
+  saveUninitialized: true,
+}));
+```
+이제 session이 사이트로 들어오는 모두를 기억하게 될거야
+
+## #7.9~ Logged In User
+
+### login
+사용자가 로그인을 하면 loggedIn이 true가 되고 user 값이 session에 저장 돼
+```
+// login
+req.session.loggedIn = true;
+req.session.user = user;
+```
+
+### template <-> Controller 데이터 공유 ==> template(pug)에서 login 확인 하기
+res.locals를 사용하면 돼
+locals object는 이미 모든 pug template에 import된 object다.
+```
+// server (router)
+app.use((req, res, next) => {
+  req.sessionStore.all((error, sessions) => {
+    console.log(sessions);
+    next();
+  });
+})
+
+// template
+${sexy} 라고만 쓰면 you가 나옴
+```
+
+그런데 위처럼 쓸 수는 없으니 src/middlewares.js를 생성하고
+그 안에 export로 middleware를 만든 다음에 server에서 아래처럼 추가
+```
+// [session middleware]
+app.use(localsMiddleware);
+// [other things...]
+```
+꼭 local middleware는 session middleware 다음에 와야 한다.
+
+```
+if loggedIn
+  li
+    a(href="/logout") Log Out
+else
+  li
+    a(href="/join") Join
+  li
+    a(href="/login") Login
 ```
