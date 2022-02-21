@@ -887,7 +887,8 @@ if (!ok) {
 쿠키? 단지 정보를 주고받는 방법
 
 ### 세션?
-session id는 쿠키에 저장되고 backend에도 저장 된다.
+session id는 쿠키에 저장된다. session은 쿠키에 저장되지 X
+session data는 server side에 저장된다. -> db에 따로 저장해야함 (뒤에서)
 
 백엔드와 브라우저 사이에 어떤 활동을 했는지를 기억하는 것
 백엔드와 브라우저 사이의 memory, history
@@ -964,4 +965,26 @@ else
     a(href="/join") Join
   li
     a(href="/login") Login
+```
+
+## #7.12 MongoStore (connect-mongo)
+### why mongodb?
+Session id is saved in the cookie.
+Session data is stored in the server-side, but only memory store,
+so we need to store session data in MongoDB.
+
+### Installation & Settings
+```
+npm i connect-mongo
+```
+
+설치 후 server.js에서 MongoStore로 import 한 다음에
+session 미들웨어에서 store 설정을 바꾼다.
+```
+app.use(session({
+  secret: "Hello!",
+  resave: true,
+  saveUninitialized: true,
+  store: MongoStore.create({mongoUrl: "mongodb://127.0.0.1:27017/wetube"}),
+}));
 ```
