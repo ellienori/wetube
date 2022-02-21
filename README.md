@@ -1016,3 +1016,66 @@ backend가 로그인한 사용자에게만 쿠키를 주도록 설정한다. (�
 
 backend가 DB에 저장하는 게 session 인증의 문제점 중 하나
 해결책: token authentication (cookie 없을 때는 token을 사용)
+
+## #7.14 Expiration and secrets
+### Secret
+- 어디에 있어? server.js에서 session 등록할 때 첫 번째 값
+- 이게 뭐야?
+우리가 쿠키에 sign 할 때 사용하는 string (혹은 array)
+sign 하는 이유? 우리 backend가 쿠키를 줬다는 걸 보여주기 위해서
+(session hijack 방지: 누가 내 세션 훔쳐서 나인척 할 수 있어)
+
+### Domain
+- web browser에서 Application > Cookies 보면 Value 옆에 Domain이 있음
+이 쿠키를 만든 backend가 누구인지 알려줘. 우리꺼에서는 값이 localhost
+- 브라우저는 도메인에 따라 쿠키를 저장하도록 되어 있다
+
+### Expires
+우리꺼에 Session 이라고 되어있는데 이 쿠키는 만료 날짜가 명시되어 있지 않음을 의미
+사용자가 shut down 혹은 컴퓨터 재시작하면 하면 쿠키가 사라진다.
+
+### Max-Age
+말 그대로 언제 세션이 만료되는지 알려줌
+```
+> db.sessions.find()
+{ "_id" : "cs1cbSTdSe96lJjIMJUW7uh4h97eVZpz", "expires" : ISODate("2022-03-07T10:11:25.830Z"), "session" : "{\"cookie\":{\"originalMaxAge\":null,\"expires\":null,\"httpOnly\":true,\"path\":\"/\"},\"loggedIn\":true,\"user\":{\"_id\":\"62130418a9182cfa618579f0\",\"email\":\"ellie@test.com\",\"username\":\"ellie\",\"password\":\"$2b$05$HFecuZEf30jaCyP0Uc59t.sr2Lg.3QCD1pVA7Ji2SDbJJmFHeCUbK\",\"name\":\"Ellie\",\"location\":\"Seoul\",\"__v\":0}}" }
+```
+보면 expires 값이 있어
+이 브라우저가 평생 켜져있거나 사용자가 브라우저를 평생 켜놔도 backend가 3/7 이라고 날짜 박아놈
+```
+app.use(session({
+  secret: "Hello!",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 20000,
+  },
+  store: MongoStore.create({mongoUrl: "mongodb://127.0.0.1:27017/wetube"}),
+}));
+```
+cookie는 밀리세컨드 단위라서 20초 후로 설정함
+
+### 어쨌든 우리는
+session에서 secret이랑 mongoDB url을 이렇게 string으로 넣어서는 안된다.
+그래서 .env를 생성하고 .gitignore에도 추가한다 (공개되지 않도록)
+
+#### .env
+
+##### Installation & Setting
+```
+npm i dotenv
+```
+
+모든 파일의 상단에
+```
+require("dotenv").config();
+```
+라고 적거나 
+init.js에 import 하기
+```
+import "dotenv/config";
+```
+
+##### .env 파일 내용
+관습적으로 모두 대문자로 적음
+사용은 process.env.COOKIE_SECRET 이렇게
