@@ -865,3 +865,16 @@ Bad request 400
 ```
 return res.status(400).render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
 ```
+
+## #7.6~ Login
+사용자가 입력한 password와 db에 hashed password가 같은지 비교하기
+```
+const ok = await bcrypt.compare(password, user.password);
+if (!ok) {
+  return res
+    .status(400).render("login", { 
+      pageTitle, 
+      errorMessage: "Wrong password.",
+    });
+}
+```
