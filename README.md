@@ -1079,3 +1079,64 @@ import "dotenv/config";
 ##### .env 파일 내용
 관습적으로 모두 대문자로 적음
 사용은 process.env.COOKIE_SECRET 이렇게
+
+## #7.16~ github login
+### flow
+1. 사용자를 깃헙으로 보내 (redirect to github) -> https://github.com/login/oauth/authorize
+  해당 내용을 login.pug에 추가함, client_id는 아래 OAuth 생성하기 참고
+  ```
+  a(href="https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4") Continue with Github &rarr;
+  ```
+
+  그런데 위에 처럼해서 진행하면 public data만 받아오게 됨. 우리는 사용자 email 등의 더 많은 데이터를 원해
+  scope을 사용할거야. 자세한 내용은 아래 scope 참고
+
+2. 그럼 사용자는 깃헙에 이메일과 비밀번호를 넣고 우리에게 정보를 공유하는 것을 승인할거야 (Authorize)
+3. 그럼 깃헙은 사용자를 우리 사이트로 돌려보냄 + token과 함께 redirect
+
+### OAuth 생성하기
+github.com/settings/apps > OAuth Apps > Create
+
+Application name: Wetube
+Homepage URL: http://localhost:4000/
+Application description: Wetube Reloaded
+Authorization callback URL: http://localhost:4000/users/github/finish
+
+URL에 해당 내용은 우리가 저렇게 정한 거임
+
+### scope
+scope에는 우리가 사용자에 대해 어디까지 알 수 있는지 적으면 된다.
+유저에게서 얼마나 많은 정보를 읽어내고 어떤 정보를 가져올 것에 대한 것
+
+참고로 카톡에서는 permission 이라고 표현한다.
+
+여러 개의 scope를 입력할 때는 띄어쓰기로 하면 된다.
+
+allow_signup: user가 github에 계정이 없다면 생성할 수 있게 할래? 아니면 계정이 이미 있는 사람들만 로그인하게 할래? (default: true)
+
+https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4&allow_signup=false&scope=user:email
+url이 너무 길어서 아래처럼 임의로 정함 (login.pub)
+```
+a(href="/users/github/start") Continue with Github &rarr;
+```
+그리고 router와 controller에 startGithubLogin 생성
+controller에서 URLSearchParams 사용
+
+config 오브젝트 생성할 때 key값을 url에 있는 거 그대로 사용해야 함
+```
+export const startGithubLogin = (req, res) => {
+  // https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4&allow_signup=false&scope=user:email
+  const baseUrl = "https://github.com/login/oauth/authorize";
+  const config = {
+    client_id: "5584aeba81be37dea8a4",
+    allow_signup: false,
+    scope: "read:user user:email",
+  }
+  const params = new URLSearchParams(config).toString();
+  const finalUrl = `${baseUrl}?${params}`;
+  return res.redirect(finalUrl);
+}
+```
+### authorize
+사용자가 login > github login > 후 authorize 누르면 /users/github/finish 로 redirect 된다.
+그리고 뒤에 ?code=어쩌고 도 함께 보내줌
