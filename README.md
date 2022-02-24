@@ -1082,6 +1082,8 @@ import "dotenv/config";
 
 ## #7.16~ github login
 ### flow
+참고: https://docs.github.com/en/developers/apps/building-oauth-apps
+
 1. 사용자를 깃헙으로 보내 (redirect to github) -> https://github.com/login/oauth/authorize
   해당 내용을 login.pug에 추가함, client_id는 아래 OAuth 생성하기 참고
   ```
@@ -1094,7 +1096,8 @@ import "dotenv/config";
 2. 그럼 사용자는 깃헙에 이메일과 비밀번호를 넣고 우리에게 정보를 공유하는 것을 승인할거야 (Authorize)
 3. 그럼 깃헙은 사용자를 우리 사이트로 돌려보냄 + token과 함께 redirect
 
-### OAuth 생성하기
+### step 1
+#### OAuth 생성하기
 github.com/settings/apps > OAuth Apps > Create
 
 Application name: Wetube
@@ -1104,7 +1107,7 @@ Authorization callback URL: http://localhost:4000/users/github/finish
 
 URL에 해당 내용은 우리가 저렇게 정한 거임
 
-### scope
+#### scope
 scope에는 우리가 사용자에 대해 어디까지 알 수 있는지 적으면 된다.
 유저에게서 얼마나 많은 정보를 읽어내고 어떤 정보를 가져올 것에 대한 것
 
@@ -1137,6 +1140,83 @@ export const startGithubLogin = (req, res) => {
   return res.redirect(finalUrl);
 }
 ```
-### authorize
+
+### step 2
+#### authorize
 사용자가 login > github login > 후 authorize 누르면 /users/github/finish 로 redirect 된다.
 그리고 뒤에 ?code=어쩌고 도 함께 보내줌
+
+#### access_token
+github에서 받은 code를 access 토큰으로 바꿔줘야 해
+>> POST https://github.com/login/oauth/access_token
+
+필요한 것 (required)
+code: url에 있음
+client_id: oauth 생성할 때 받음 -> .env에 넣을 거야
+client_secret: 말 그대로 비밀임. 오로지 backend에만 존재해야 함. github에서 generate 할 수 있고 .env에 넣음
+
+finishGithubLogin 함수 생성
+여기서 redirect 안하고 post로 url을 보낼거야
+
+#### fetch
+fetch 뭔가를 하고 싶거나 뭔가를 가져오고 싶을 때 쓴다.
+POST: 우리가 url에 뭔가를 보내고 있다!
+
+##### fetch 할 때 넣는 {} 의 의미
+
+HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해줍니다
+
+Accept
+돌려줄 데이터 타입에 대해 서버에게 알려주는 역할을 합니다
+MIME 타입입니다
+(📌MIME type이란 웹에서 사용되는 확장자라고 생각하시면 되며
+type/subtype으로 구성되어 있습니다)
+
+Authorization
+보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할을 합니다
+
+##### fetch 설치 및 사용
+nodejs에서 fetch를 사용하려면 우선 설치부터 해야함
+```
+npm install node-fetch@2.6.1
+```
+그리고 아래처럼 추가해야 함
+```
+import fetch from "node-fetch";
+```
+
+```
+const data = await fetch(finalUrl, {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+  }
+});
+const json = await data.json();
+res.send(JSON.stringify(json));
+```
+await로 하나씩 값을 기다려서 가져오고 마지막에 res.send를 쓰면 json을 그냥 화면에 뿌려준다.
+값 확인하기 좋음
+
+### step 3
+>> Authorization: token OAUTH-TOKEN
+>> GET https://api.github.com/user
+
+#### json 가져오기
+```
+// 위에꺼랑 다르게 아래는 json을 한 번에 가져오겠다.
+const {access_token} = json;
+const userRequest = await (await fetch("https://api.github.com/user", {
+  headers: {
+    Authorization: `token ${access_token}`,
+  }
+})).json();
+console.log(userRequest);
+```
+
+
+#### json 내의 email 값이 null이면
+```
+email: null,
+```
+해당 데이터가 정말 없거나 private 하다는 것을 의미
