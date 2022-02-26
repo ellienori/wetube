@@ -1281,3 +1281,12 @@ postLogin에 아래처럼 추가
 ```
 const user = await User.findOne({username, socialOnly: false}); // 그래야 password 체크를 하지
 ```
+
+## #7.22 Logout
+```
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+};
+```
+base.pug에서 logout url을 /users/logout 으로 변경
