@@ -141,12 +141,40 @@ export const finishGithubLogin = async (req, res) => {
 export const getEdit = (req, res) => res.render("edit-profile", { pageTitle: "Edit Profile" });
 
 export const postEdit = async (req, res) => {
+  const pageTitle = "Edit Profile";
+
   const {
     session: {
-      user: {_id},
+      user: {
+        _id,
+        username: _username,
+        email: _email,
+      },
     },
     body: { name, email, username, location },
   } = req;
+  
+  // username and email should be unique.
+  // email이나 username이 _username 랑 같으면 변화 없는 거야 
+  // 다르면 unique check를 해야해
+  if (email !== _email) {
+    const exist = await User.exists({email});
+    if (exist) {
+      // 못바꾸게 해야해
+      return res.status(400).render("edit-profile", { 
+        pageTitle, 
+        errorMessage: "This email is already taken."});
+    }
+  }
+  if (username !== _username) {
+    const exist = await User.exists({username});
+    if (exist) {
+      // 못바꾸게 해야해
+      return res.status(400).render("edit-profile", { 
+        pageTitle, 
+        errorMessage: "This username is already taken."});
+    }
+  }
 
   const updatedUser = await User.findByIdAndUpdate(_id, {
     name, email, username, location
