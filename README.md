@@ -1342,3 +1342,50 @@ userRouter.get("/github/finish", publicOnlyMiddleware, finishGithubLogin);
 get과 post, delete 등에 적용하고 싶으면 .all()을 사용하면 된다.
 userRouter 외에도 다른 router에 적용할 것
 
+## #8.2~ Edit profile POST
+### es6 문법 알아가기
+```
+const { name, email, username, location } = req.body;
+const id = req.session.user.id;
+```
+위의 내용은 아래처럼 바뀔 수 있다.
+```
+const {
+    session: {
+      user: {_id},
+    },
+    body: { name, email, username, location },
+  } = req;
+```
+
+### DB는 업데이트 되었으나 session은 업데이트가 안돼
+왜냐면 session은 로그인 할 때 업데이트되어서 그래
+
+- 첫번째 방법: 직접 수정하기
+```
+await User.findByIdAndUpdate(_id, {
+  name, email, username, location
+});
+
+req.session.user = {
+  ...req.session.user,
+  name,
+  email,
+  username,
+  location,
+}
+```
+form이랑 일치하는 데이터는 업데이트하고 그 외에 것은 req.session.user로 가져오겠다는 뜻
+
+- 두번째 방법: updatedUser 생성하기
+findByIdAndUpdate 함수에서 new:true를 설정하면 업데이트 된 값을 return 해주고
+그러지않으면 업데이트 전의 값을 return 해준다.
+```
+const updatedUser = await User.findByIdAndUpdate(_id, {
+  name, email, username, location
+}, { new: true });
+
+req.session.user = updatedUser;
+```
+
+### email이나 username을 수정했는데 이미 있는 애라고하면 어떡해
