@@ -1389,3 +1389,65 @@ req.session.user = updatedUser;
 ```
 
 ### email이나 username을 수정했는데 이미 있는 애라고하면 어떡해
+```
+// username and email should be unique.
+// email이나 username이 _username 랑 같으면 변화 없는 거야 
+// 다르면 unique check를 해야해
+if (email !== _email) {
+  const exist = await User.exists({email});
+  if (exist) {
+    // 못바꾸게 해야해
+    return res.status(400).render("edit-profile", { 
+      pageTitle, 
+      errorMessage: "This email is already taken."});
+  }
+}
+if (username !== _username) {
+  const exist = await User.exists({username});
+  if (exist) {
+    // 못바꾸게 해야해
+    return res.status(400).render("edit-profile", { 
+      pageTitle, 
+      errorMessage: "This username is already taken."});
+  }
+}
+```
+
+## #8.4~ Change password
+
+### template
+edit-profile.pug 아래에 아래 내용 추가
+```
+a(href="change-password")
+```
+상대경로를 넣는거기 때문에 /users/change-password로 읽힌다.
+
+### github으로 회원가입 한 경우에는?
+패스워드가 없기 때문에 다른 처리를 해줘야 함
+
+- 첫번째 방법: socialOnly true면 redirect 시키기
+```
+export const getChangePassword = (req, res) => {
+  if(req.session.user.socialOnly === true) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+}
+```
+```
+if !loggedInUser.socialOnly
+  hr
+  a(href="change-password") Change Password &rarr;
+```
+
+- 두번째 방법: form을 볼 수는 있지만 사용하지 못하게 하기
+안함
+
+### password 변경 처리
+비밀번호를 저장하려면 User.js에서 user create 될 때 pre("save")를 썼었는데 걔를 user save 할 때도 쓸 수 있도록 할거야
+```
+// to hash new password
+const user = await User.findById(_id);
+user.password = newPassword;
+await user.save(); 
+```
