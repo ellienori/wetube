@@ -42,7 +42,7 @@ export const getLogin = (req, res) => res.render("login", { pageTitle: "Login" }
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
   const pageTitle = "Login";
-  const user = await User.findOne({username});
+  const user = await User.findOne({username, socialOnly: false}); // 그래야 password 체크를 하지
   if (!user) {
     return res.status(400).render("login", { 
         pageTitle,
@@ -99,12 +99,44 @@ export const finishGithubLogin = async (req, res) => {
   // 위에꺼랑 다르게 아래는 json을 한 번에 가져오겠다.
   if ("access_token" in json) {
     const {access_token} = json;
-    const userRequest = await (await fetch("https://api.github.com/user", {
+    const apiUrl = "https://api.github.com";
+    const userData = await (await fetch(`${apiUrl}/user`, { // user data
       headers: {
         Authorization: `token ${access_token}`,
       }
     })).json();
-    console.log(userRequest);
+    const emailData = await (await fetch(`${apiUrl}/user/emails`, { // email data
+      headers: {
+        Authorization: `token ${access_token}`,
+      }
+    })).json();
+
+    const emailObj = emailData.find(value => value.primary === true && value.verified === true);
+    if (!emailObj) { // email이 없다면
+      return res.redirect("/login");
+    }
+
+    const existingUser = await User.findOne({email: emailObj.email});
+    if (existingUser) {
+      // login
+      req.session.loggedIn = true;
+      req.session.user = existingUser;
+      return res.redirect("/");
+    } else {
+      // create an account
+      const user = await User.create({
+        name: userData.name? userData.name : userData.login, 
+        username: userData.login, 
+        email: emailObj.email, 
+        password: "", 
+        socialOnly: true,
+        location: userData.location,
+      });
+      req.session.loggedIn = true;
+      req.session.user = user;
+      return res.redirect("/");
+    }
+
   } else {
     return res.redirect("/login");
   }

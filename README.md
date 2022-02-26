@@ -1082,7 +1082,7 @@ import "dotenv/config";
 
 ## #7.16~ github login
 ### flow
-참고: https://docs.github.com/en/developers/apps/building-oauth-apps
+> 참고: https://docs.github.com/en/developers/apps/building-oauth-apps
 
 1. 사용자를 깃헙으로 보내 (redirect to github) -> https://github.com/login/oauth/authorize
   해당 내용을 login.pug에 추가함, client_id는 아래 OAuth 생성하기 참고
@@ -1148,7 +1148,7 @@ export const startGithubLogin = (req, res) => {
 
 #### access_token
 github에서 받은 code를 access 토큰으로 바꿔줘야 해
->> POST https://github.com/login/oauth/access_token
+> POST https://github.com/login/oauth/access_token
 
 필요한 것 (required)
 code: url에 있음
@@ -1199,8 +1199,8 @@ await로 하나씩 값을 기다려서 가져오고 마지막에 res.send를 쓰
 값 확인하기 좋음
 
 ### step 3
->> Authorization: token OAUTH-TOKEN
->> GET https://api.github.com/user
+> Authorization: token OAUTH-TOKEN
+> GET https://api.github.com/user
 
 #### json 가져오기
 ```
@@ -1214,9 +1214,70 @@ const userRequest = await (await fetch("https://api.github.com/user", {
 console.log(userRequest);
 ```
 
+#### access_token의 역할
+우리가 scope에 적은 내용
+> scope: "read:user user:email",
+에 해당되는 데이터를 가져오는 역할만 할 수 있다.
 
-#### json 내의 email 값이 null이면
+#### json 출력값
 ```
 email: null,
 ```
 해당 데이터가 정말 없거나 private 하다는 것을 의미
+그런데 우리가 scope에 값을 2개를 넣었는데 지금 read:user만 가져와서 이런 거야
+
+#### email 가져오기
+> 참고: https://docs.github.com/en/rest/reference/users#list-email-addresses-for-the-authenticated-user
+> GET /user/emails
+우리가 위에서 사용한 access_token을 가지고 이번에는 email 값을 가져오자
+```
+const emailData = await (await fetch(`${apiUrl}/user/emails`, { // email data
+  headers: {
+    Authorization: `token ${access_token}`,
+  }
+})).json();
+```
+
+출력값
+```
+[
+  {
+    email: 'polystudio7@gmail.com',
+    primary: true,
+    verified: true,
+    visibility: 'private'
+  },
+  {
+    email: '84376046+polystudio@users.noreply.github.com',
+    primary: false,
+    verified: true,
+    visibility: null
+  }
+]
+```
+이제 여기서 verifed, primary 값을 찾아야 해
+```
+const email = emailData.find(value => value.primary === true && value.verified === true).email;
+```
+
+### Login Rules
+github에서 주는 primary/verifed email이 이미 등록된 email 일 때 -> 로그인 시켜주자
+                                                        -> 없으면 계정 생성하라고 하자 (우리 이미 user 정보 있어서 만들면 돼)
+
+github으로 로그인했는지 여부 파악을 위해 User model에 변수 추가
+```
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  socialOnly: { type: Boolean, deafult: false }, // github으로 로그인했는지 아닌지
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  location: { type: String },
+});
+```
+
+만약 일반 로그인을 하는 사람이라면 password를 체크해야하니까
+postLogin에 아래처럼 추가
+```
+const user = await User.findOne({username, socialOnly: false}); // 그래야 password 체크를 하지
+```
