@@ -1298,3 +1298,47 @@ base.pug에서 logout url을 /users/logout 으로 변경
 > 1. userController.js에 postEdit과 getEdit 생성 후 userRouter.js에 route 등록을 한다.
 > 2. base.pug에서 Template을 수정한다.
 > 3. edit-profile.pug 생성 (models/User.js와 middlewares.js 참고)
+
+## #8.1 Protector and Public middlewares
+### 로그인을 하지 않은 사용자가 edit-profile에 접근한다면?
+```
+res.locals.loggedInUser = req.session.user || {};
+```
+undefined 일 경우 빈 오브젝트를 넣도록 middlewares에서 설정
+
+### 로그인하지 않은 사람들이 우리가 보호하려는 페이지에 접근하는 걸 막자
+```
+// protect pages
+export const protectorMiddleware = (req, res, next) => {
+  // if user is not logged in, redirect to login page.
+  // unless, let her keep requesting something.
+  if (req.session.loggedIn) {
+    next();
+  } else {
+    return res.redirect("/login");
+  }
+}
+
+// public only (if I am already logged in, but the website requires log in <- annoying)
+export const publicOnlyMiddleware = (req, res, next) => {
+  if (!req.session.loggedIn) {
+    next();
+  } else {
+    return res.redirect("/");
+  }
+}
+```
+middleware에 두 개의 함수 추가.
+- protectorMiddleware: 사용자가 로그인하지 않았다면 로그인 페이지로 안내한다.
+- publicOnlyMiddleware: 사용자가 로그인했으면 로그인을 요구하지 않고 홈으로 이동시킨다.
+
+#### router에 적용하기
+```
+userRouter.get("/logout", protectorMiddleware, logout);
+userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
+userRouter.get("/github/start", publicOnlyMiddleware, startGithubLogin);
+userRouter.get("/github/finish", publicOnlyMiddleware, finishGithubLogin);
+```
+get과 post, delete 등에 적용하고 싶으면 .all()을 사용하면 된다.
+userRouter 외에도 다른 router에 적용할 것
+

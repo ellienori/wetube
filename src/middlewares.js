@@ -6,3 +6,23 @@ export const localsMiddleware = (req, res, next) => {
   console.log(res.locals);
   next();
 }
+
+// protect pages
+export const protectorMiddleware = (req, res, next) => {
+  // if user is not logged in, redirect to login page.
+  // unless, let her keep requesting something.
+  if (req.session.loggedIn) {
+    next();
+  } else {
+    return res.redirect("/login");
+  }
+}
+
+// public only (if I am already logged in, but the website requires log in <- annoying)
+export const publicOnlyMiddleware = (req, res, next) => {
+  if (!req.session.loggedIn) {
+    next();
+  } else {
+    return res.redirect("/");
+  }
+}
