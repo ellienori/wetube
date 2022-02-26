@@ -1290,3 +1290,11 @@ export const logout = (req, res) => {
 };
 ```
 base.pug에서 logout url을 /users/logout 으로 변경
+
+# #8 User Profile
+## #8.0 Edit Profile GET
+
+### Setting 하는 법
+> 1. userController.js에 postEdit과 getEdit 생성 후 userRouter.js에 route 등록을 한다.
+> 2. base.pug에서 Template을 수정한다.
+> 3. edit-profile.pug 생성 (models/User.js와 middlewares.js 참고)
