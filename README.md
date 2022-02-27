@@ -1580,3 +1580,38 @@ li
 ### 그 외
 controller, router 등은 알아서 잘 하면 된다.
 
+## #8.11 Video owner
+지금은 video와 user가 연결되어 있지 않다 -> _id를 사용해야해 (super unique 하니까)
+users에는 user가 업로드한 모든 영상의 id를 저장할거고
+videos는 해당 영상을 올린 user의 id를 저장할거야
+
+### Step 1. Models에 적용하기
+Videos에 owner의 objectId 추가하기
+ObjectId는 JS에서 제공하는 type이 아니고 mongoose에서 제공하는 type임
+그리고 어떤 Model의 objectid인지 ref로 넣어줘야 함
+```
+owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref:"User" },
+```
+
+template에 적용할 때 String인지 Object인지 확인할 것
+```
+if String(video.owner) === String(loggedInUser._id)
+  a(href=`${video.id}/edit`) Edit Video &rarr;
+  br
+  a(href=`${video.id}/delete`) Delete Video &rarr;
+```
+
+### Step 2-1. User Model 불러오기
+```
+let owner = await User.findById(video.owner);
+  if (!owner) {
+    owner = {
+      name: Unknown,
+    };
+  }
+```
+위처럼 적용하고 render 할 때 owner를 함께 보내준다.
+디비를 두 번이나 불러야해서 그리 좋은 방법은 아님
+
+### Step 2-2. 혹은 ref 사용하기
+우리가 Videos Model에서 owner 정의할 때 ref를 넣었으니 걔를 써보도록 하자

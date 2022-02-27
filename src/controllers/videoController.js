@@ -1,4 +1,5 @@
-import Video, { formatHashtags } from "../models/Video";
+import Video from "../models/Video";
+import User from "../models/User";
 
 export const home = async (req, res) => {
   try {
@@ -15,7 +16,14 @@ export const watch = async (req, res) => {
   if (!video) {
     return res.render("404", { pageTitle: "Video Not Found." })
   }
-  return res.render("videos/watch", { pageTitle: `🎬 ${video.title}`, video });
+
+  let owner = await User.findById(video.owner);
+  if (!owner) {
+    owner = {
+      name: Unknown,
+    };
+  }
+  return res.render("videos/watch", { pageTitle: `🎬 ${video.title}`, video, owner });
 };
 
 export const getEdit = async (req, res) => {
@@ -53,6 +61,11 @@ export const postUpload = async (req, res) => {
       title, description, hashtags,
     },
     file,
+    session: {
+      user: {
+        _id,
+      }
+    }
   } = req;
 
   try {
@@ -65,6 +78,7 @@ export const postUpload = async (req, res) => {
         rating: 0,
       },
       hashtags: Video.formatHashtags(hashtags),
+      owner: _id,
     });
     return res.redirect("/");
   } catch (error) {
