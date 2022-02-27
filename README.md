@@ -1580,7 +1580,7 @@ li
 ### 그 외
 controller, router 등은 알아서 잘 하면 된다.
 
-## #8.11 Video owner
+## #8.11~ Video owner
 지금은 video와 user가 연결되어 있지 않다 -> _id를 사용해야해 (super unique 하니까)
 users에는 user가 업로드한 모든 영상의 id를 저장할거고
 videos는 해당 영상을 올린 user의 id를 저장할거야
@@ -1615,3 +1615,79 @@ let owner = await User.findById(video.owner);
 
 ### Step 2-2. 혹은 ref 사용하기
 우리가 Videos Model에서 owner 정의할 때 ref를 넣었으니 걔를 써보도록 하자
+mongoose는 owner에 저장된 objectId가 user에서 온 것을 알고있다.
+```
+const video = await Video.findById(id).populate("owner");
+```
+populate()는 실제 owner를 user로 채워준다
+
+```
+{
+  meta: { views: 0, rating: 0 },
+  _id: new ObjectId("621afbb4649abcc85a2cb3c1"),
+  title: 'Roo',
+  description: 'Roo plays with the yellow star.',
+  videoUrl: 'uploads/videos/e0263752d59b16886dc247883265e7b8',
+  hashtags: [ '#roo', '#dogs', '#cute', '#lovely' ],
+  owner: {
+    _id: new ObjectId("621afb0d89c41998c51031ae"),
+    email: 'polystudio7@gmail.com',
+    avatarUrl: 'https://avatars.githubusercontent.com/u/84376046?v=4',
+    socialOnly: true,
+    username: 'polystudio',
+    password: '$2b$05$lBDqkxx7Q8iittmFBiPp5.5ipEBNEEYjCkO69YngDWs/RpnshEvpe',
+    name: 'polystudio',
+    location: null,
+    __v: 0
+  },
+  createdAt: 2022-02-27T04:19:00.852Z,
+  __v: 0
+}
+```
+
+### Step 3. Uploaded by와 Profile 연결하기
+```
+div
+  small Uploaded by 
+    a(href=`/users/${video.owner._id}`)=video.owner.name
+```
+저렇게 profile로 이동했을 때 해당 profile에서 그 사용자가 올린 모든 영상 리스트를 보고 싶다.
+
+### Step 4-1. owner.user._id로 videos 찾아오기
+video의 owner가 params의 id와 같은 video를 찾을 거야
+```
+const videos = await Video.find({owner: user._id});
+return res.render("users/profile", { pageTitle: user.name, user, videos });
+```
+그리고 page를 render 할 때 video 정보를 함게 보내준다.
+비디오는 아래처럼 배열로 나온다.
+
+output:
+```
+[
+  {
+    meta: { views: 0, rating: 0 },
+    _id: new ObjectId("621afbb4649abcc85a2cb3c1"),
+    title: 'Roo',
+    description: 'Roo plays with the yellow star.',
+    videoUrl: 'uploads/videos/e0263752d59b16886dc247883265e7b8',
+    hashtags: [ '#roo', '#dogs', '#cute', '#lovely' ],
+    owner: new ObjectId("621afb0d89c41998c51031ae"),
+    createdAt: 2022-02-27T04:19:00.852Z,
+    __v: 0
+  }
+]
+```
+
+그리고 profile.pug에 아래처럼 videos array를 출력한다.
+```
+include ../mixins/video
+
+block content 
+  each video in videos
+    +video(video)
+  else
+    li Sorry, nothing found ❌
+```
+
+### Step 4-2. 혹은 
