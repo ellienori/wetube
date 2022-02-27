@@ -1932,3 +1932,63 @@ webpack은 뒤에서부터 시작하기 때문에 역순으로 입력해야 한�
   use: ["style-loader", "css-loader", "sass-loader"],
 }
 ```
+
+## #9.5 MiniCssExtractPlugin
+https://www.npmjs.com/package/mini-css-extract-plugin
+그런데 우리는 css가 js에 합쳐진 상태로 하고 싶은 게 아니고 js와 css를 분리하고 싶은 거니까 코드를 다시 고치자.
+### 설치
+```
+npm i -D mini-css-extract-plugin
+```
+이제 style-loader를 쓰지 않고 대신 mini-css-extract-plugin 쓴다.
+```
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+  plugins: [new MiniCssExtractPlugin()],
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+    ],
+  },
+};
+```
+
+### 이 상태로 다시 npm run assets 하면
+```
+asset main.js 3.37 KiB [emitted] (name: main)
+asset main.css 406 bytes [emitted] (name: main)
+```
+assets/js 아래에 main.js와 main.css가 따로 생긴다.
+
+그런데 우리는 js는 js에 css는 css에 넣고 싶어
+
+- main.js를 assets/js에 넣기 위에 아래처럼 수정한다.
+```
+output: {
+  filename: "js/main.js",
+  path: path.resolve(__dirname, "assets"),
+},
+```
+
+- main.css를 assets/css에 넣기 위해 filename option을 사용한다.
+```
+plugins: [new MiniCssExtractPlugin({
+  filename: "css/styles.css",
+})],
+```
+
+### 이제 pug에서 css 파일 연결할 거야
+```
+html(lang="ko")
+  head
+    title #{pageTitle} | Wetube
+    link(rel="stylesheet" href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet" href="/assets/css/styles.css")
+```
+명심할 것!
+client 파일은 webpack에 의해서만 로딩하게 할 거고
+assets(static) 파일은 pug에서 로딩된다. 즉 사용자와 template은 만들어진 부분만 보게 된다.
