@@ -1748,3 +1748,33 @@ export const see = async (req, res) => {
   return res.render("users/profile", { pageTitle: user.name, user });
 };
 ```
+
+## #8.14 Bug fix
+### 1. password hash bug
+user를 save 할 때마다 User.js의 userSchema.pre("save")에서 password를 매번 hashing 하고 있어.
+videoController에서 영상을 업로드할 때마다 user.save()를 실행하는데 그때마다 비번이 다시 hash 돼.
+그럼 사용자가 로그인 다시 못함..;;;;;;
+그래서 User.js에서 if문을 추가해서 password가 수정되었을 경우에만 hash 하도록 바꿈
+```
+userSchema.pre('save', async function() {
+  if(this.isModified("password")) {
+    this.password = await bcrypt.hash(this.password, 5);
+  }
+});
+```
+
+### 2. edit form bug
+videoController의 getEdit에서 render 되는 edit page가 영상 주인에게만 나타나야해
+```
+const {
+  params: { id },
+  session: {
+    user: { _id }
+  }
+} = req;
+
+if (String(video.owner) !== String(_id)) {
+  return res.status(403).redirect("/"); // 403: Forbidden
+}
+```
+postEdit에도 위의 내용 추가
