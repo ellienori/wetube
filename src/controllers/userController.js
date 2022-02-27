@@ -138,7 +138,7 @@ export const finishGithubLogin = async (req, res) => {
   }
 }
 
-export const getEdit = (req, res) => res.render("edit-profile", { pageTitle: "Edit Profile" });
+export const getEdit = (req, res) => res.render("users/edit-profile", { pageTitle: "Edit Profile" });
 
 export const postEdit = async (req, res) => {
   const pageTitle = "Edit Profile";
@@ -161,7 +161,7 @@ export const postEdit = async (req, res) => {
     const exist = await User.exists({email});
     if (exist) {
       // 못바꾸게 해야해
-      return res.status(400).render("edit-profile", { 
+      return res.status(400).render("users/edit-profile", { 
         pageTitle, 
         errorMessage: "This email is already taken."});
     }
@@ -170,7 +170,7 @@ export const postEdit = async (req, res) => {
     const exist = await User.exists({username});
     if (exist) {
       // 못바꾸게 해야해
-      return res.status(400).render("edit-profile", { 
+      return res.status(400).render("users/edit-profile", { 
         pageTitle, 
         errorMessage: "This username is already taken."});
     }
