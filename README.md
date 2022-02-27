@@ -1778,3 +1778,122 @@ if (String(video.owner) !== String(_id)) {
 }
 ```
 postEdit에도 위의 내용 추가
+
+# #9 WEBPACK - frontend
+
+## #9.0 Introduction to Webpack
+현재 모든 JS는 backend에서 돌아감
+그래서 이제 Brower에서 JS 돌아가게 할거야
+
+### Webpack
+package.json 보면 scripts에 우리가 지금 babel node 쓰고 있잖아
+그 덕에 node.js가 JS 이해할 거라고 확신할 수 있지
+즉, Backend JS는 Babel Node가 다 처리해준다.
+
+Frontend는? webpack 사용
+https://webpack.js.org/
+
+근데 보통 webpack을 직접적으로 사용하지는 않고
+webpack을 포함하는 framework를 쓰게 될거야 (e.g. react, vue, next, ...)
+그래서 아마 configuration을 현업에서 직접 다룰 일은 없을 거다
+
+## #9.1~ Webpack Configuration
+
+### 설치
+```
+npm i webpack webpack-cli -D
+```
+우리가 webpack에 알려줄 내용은 "여기에 source files이 있고 이 곳이 네가 결과물을 보낼 폴더야."
+즉 우리가 코딩 할 곳은 src/client/js 고 browser가 읽을 곳은 assets/js 다.
+
+### webpack.config.js
+해당 파일 생성. 이 파일은 구식 JS 문법만 이해할 수 있어
+import, export 이런 명령어 이해 못함
+
+webpack.config에 필요한 내용 2가지
+1) entry
+우리가 처리하고자 하는 파일을 의미 e.g. Sexy JS
+entry를 webpack에게 넘겨줘야하는데 src/client 아래에 있는 파일을 entry라고 하자
+src/client/js/main.js 생성
+2) output
+어디에 결과물이 나올지
+
+```
+const path = require("path");
+
+module.exports = {
+  entry: "./src/client/js/main.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "assets", "js"),
+  }
+}
+```
+
+그리고 config를 실행시키기 위해 package.json에 스크립트를 추가하자
+```
+"scripts": {
+  "dev": "nodemon --exec babel-node src/init.js",
+  "assets": "webpack --config webpack.config.js"
+```
+
+```
+npm run assets
+```
+실행하고 나면 assets/js/main.js에 우리가 작성한 코드가 압축되어 있는 것을 확인할 수 있다.
+
+### Rules
+rules는 우리가 각각의 파일 종류에 따라 어떤 전환을 할 건지 결정하는 것
+그 파일 종류에 따라 적합한 loader를 찾아 설정하면 된다
+우리는 babel-loader가 필요함
+
+#### babel-loader
+https://www.npmjs.com/package/babel-loader
+```
+npm i -D babel-loader @babel/core @babel/preset-env webpack
+```
+우리 이미 다 설치해서 babel-loader만 설치하면 돼
+
+```
+module: {
+  rules: [
+    {
+      test: /\.js$/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            ['@babel/preset-env', { targets: "defaults" }]
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+이 상태로 다시 npm run assets 실행시키면 코드가 더 요생해져있는데 babel이 이렇게 만든거야
+
+### mode warning
+```
+WARNING in configuration
+The 'mode' option has not been set, webpack will fallback to 'production' for this value.
+Set 'mode' option to 'development' or 'production' to enable defaults for each environment.
+```
+우선 현재 개발 중이라고 설정하자
+
+```
+mode: "development",
+```
+
+### express에게 assets의 정체를 알려주기
+uploads 하듯이 server.js에 설정한다.
+```
+app.use("/assets", express.static("assets"));
+```
+
+### template과 js 연결하기
+base.pug 맨 아래에 스크립트 추가
+```
+script(src="/assets/js/main.js")
+```
