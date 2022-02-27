@@ -1690,4 +1690,61 @@ block content
     li Sorry, nothing found ❌
 ```
 
-### Step 4-2. 혹은 
+### Step 4-2. 혹은 populate
+Video는 하나의 owner를 가지고 owner는 여러 video를 가질 수 있다.
+그래서 User에 videos라는 array를 만들어주자.
+```
+videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
+```
+
+이제 동영상을 업로드할 때마다 User에도 video id를 저장해줘야해
+videoController.js > postUpload
+
+create method는 새로 만드는 오브젝트를 return 해준다.
+따라서 await Video.create({})을 가져올 수 있다.
+
+Before
+```
+await Video.create({
+  title,
+  description,
+  videoUrl: file.path,
+  meta: {
+    views: 0,
+    rating: 0,
+  },
+  hashtags: Video.formatHashtags(hashtags),
+  owner: _id,
+});
+return res.redirect("/");
+```
+
+After
+```
+await Video.create({
+  title,
+  description,
+  videoUrl: file.path,
+  meta: {
+    views: 0,
+    rating: 0,
+  },
+  hashtags: Video.formatHashtags(hashtags),
+  owner: _id,
+});
+return res.redirect("/");
+```
+
+그리고 user profile 보여주는 부분에 populate 설정하기
+userController > see
+```
+export const see = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found."});
+  }
+
+  return res.render("users/profile", { pageTitle: user.name, user });
+};
+```
