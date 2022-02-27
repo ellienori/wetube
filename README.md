@@ -1543,3 +1543,27 @@ static 안에는 root directory를 넣는다
 
 2. DB에 절대 file을 저장하면 안돼. path를 저장해야해!!
 원본은 hard driver나 amazone 같은 데 저장하면 된다.
+
+## #8.9~ video upload
+### 기본 세팅
+template, router 등 수정
+
+### 추가 변경 사항
+middleware에 만들었던 fileuploadmiddleware를 avatar 용과 video 용으로 나눠서 생성
+```
+// multer middleware
+// 사용자가 업로드하는 모든 파일을 우리 서버의 destination에 저장한다.
+export const uploadAvatarMiddleware = multer({
+  dest: "uploads/avatars/",
+  limits: {
+    fileSize: 3000000,
+  }
+});
+
+export const uploadVideoMiddleware = multer({
+  dest: "uploads/videos/",
+  limits: {
+    fileSize: 10000000,
+  }
+});
+```

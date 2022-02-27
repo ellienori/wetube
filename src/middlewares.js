@@ -31,6 +31,16 @@ export const publicOnlyMiddleware = (req, res, next) => {
 
 // multer middleware
 // 사용자가 업로드하는 모든 파일을 우리 서버의 destination에 저장한다.
-export const uploadFilesMiddleware = multer({
-  dest: "uploads/",
+export const uploadAvatarMiddleware = multer({
+  dest: "uploads/avatars/",
+  limits: {
+    fileSize: 3000000,
+  }
+});
+
+export const uploadVideoMiddleware = multer({
+  dest: "uploads/videos/",
+  limits: {
+    fileSize: 10000000,
+  }
 });
