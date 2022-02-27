@@ -1992,3 +1992,60 @@ html(lang="ko")
 명심할 것!
 client 파일은 webpack에 의해서만 로딩하게 할 거고
 assets(static) 파일은 pug에서 로딩된다. 즉 사용자와 template은 만들어진 부분만 보게 된다.
+
+## #9.6 Better developer experience
+### frontend도 수정되면 자동으로 npm 실행되게 하기
+config에 watch를 추가하면 front-end webpack이 계속 살아있게 된다.
+```
+watch: true,
+```
+
+output folder를 클린해주는 설정을 추가한다.
+근데 이거는 완벽히 webpack을 재시작했을 때만 적용된다.
+```
+output: {
+  filename: "js/main.js",
+  path: path.resolve(__dirname, "assets"),
+  clean: true,
+},
+```
+
+### nodemon.json 생성
+front-end가 수정되는데 nodeJS도 자꾸 재실행된다.
+그래서 nodemon 설정을 바꿀거야
+
+Before
+```
+"scripts": {
+  "dev": "nodemon --exec babel-node src/init.js",
+  "assets": "webpack --config webpack.config.js"
+},
+```
+
+After
+nodemon.json을 생성 후 설정 내용을 넣는다.
+```
+{
+  "ignore": ["webpack.config.js", "src/client/*", "assets/*"],
+  "exec": "babel-node src/init.js"
+}
+```
+그리고 package.json은 아래처럼 수정한다.
+```
+"scripts": {
+  "dev": "nodemon",
+  "assets": "webpack --config webpack.config.js"
+},
+```
+
+### 최종 package.json 수정
+nodemon은 자동으로 nodemon.json을 부르고
+webpack은 자동으로 webpack.config.js를 부르기 때문에
+굳이 --config 설정 넣어주지 않아도 된다.
+그리고 dev, assets 에서 dev:server와 dev:assets으로 좀더 명시적으로 이름을 수정함
+```
+"scripts": {
+  "dev:server": "nodemon",
+  "dev:assets": "webpack"
+},
+```
