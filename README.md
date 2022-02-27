@@ -1567,3 +1567,16 @@ export const uploadVideoMiddleware = multer({
   }
 });
 ```
+
+## #8.10 User profile
+
+### template
+```
+li
+  a(href=`/users/${loggedInUser._id}`) #{loggedInUser.name}의 Profile
+```
+해당 페이지는 모든 사용자에게 공개 할 프로필임
+
+### 그 외
+controller, router 등은 알아서 잘 하면 된다.
+
