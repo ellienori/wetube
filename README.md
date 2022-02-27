@@ -1897,3 +1897,38 @@ base.pug 맨 아래에 스크립트 추가
 ```
 script(src="/assets/js/main.js")
 ```
+
+## #9.4 SCSS
+Sassy CSS
+
+### scss 폴더 및 파일 생성
+create src/client/scss/_variables.scss styles.scss
+내용을 채우고 main.js에서 styles.scss를 import 한다.
+```
+import "../scss/styles.scss";
+```
+### loader 설치
+그리고 loader(파일을 변환하는 장치)를 적용시켜줘야 한다
+3가지 loader가 필요해
+* scss -> 일반 css => sass-loader
+```
+npm i -D sass-loader sass webpack
+```
+* font 등을 사용할 때 쓰는 import나 url등을 변환 => css-loader
+```
+npm i -D css-loader
+```
+* 변환한 css -> website에 적용(DOM) => style-loader
+```
+npm i -D style-loader
+```
+
+### loader 설정
+이 세 가지 loader를 하나로 합치자
+webpack은 뒤에서부터 시작하기 때문에 역순으로 입력해야 한다.
+```
+{
+  test: /\.scss$/,
+  use: ["style-loader", "css-loader", "sass-loader"],
+}
+```
