@@ -1451,3 +1451,95 @@ const user = await User.findById(_id);
 user.password = newPassword;
 await user.save(); 
 ```
+
+## #8.6~ File Uploads
+### Step 1. Input 만들기
+```
+form(method="POST")
+  label(for="avatar") Avatar
+  input(type="file", id="avatar", name="avatar", accept="image/*")
+```
+edit-profile.pug에 위처럼 추가
+accept를 넣어 Image file만 불러올 수 있게 한다.
+
+### Step 2. middleware 사용하기 -> multer
+#### 설치
+```
+npm i multer
+```
+#### form에 enctype 추가
+form을 multipart로 만들어야 함
+```
+form(method="POST", enctype="multipart/form-data")
+  label(for="avatar") Avatar
+  input(type="file", id="avatar", name="avatar", accept="image/*")
+```
+우리 form이 다르게 encode 된다는 뜻
+
+#### configure a middleware
+middleware에 생성하기
+```
+// multer middleware
+// 사용자가 업로드하는 모든 파일을 우리 서버의 destination에 저장한다.
+export const uploadFilesMiddleware = multer({
+  dest: "uploads/",
+});
+```
+또한 uploads 폴더를 생성해줘야 한다.
+
+#### router에 적용하기
+userRouter.js의 edit에 적용한다.
+기본 사용법은
+>app.post(url, middleware, controller function)
+
+Before
+```
+userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
+```
+
+After - post에 적용
+```
+userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(uploadFilesMiddleware.single("avatar"), postEdit);
+```
+input으로 avatar 파일을 받아서 (single? 여러개 받을 때도 있기 때문) uploads 폴더에 저장한 다음
+그 파일 정보를 postEdit에 전달한다. 이렇게 하면 req에 req.file이 추가 된다.
+
+req.file 찍어보면
+```
+{
+  fieldname: 'avatar',
+  originalname: 'IMG_4143.PNG',
+  encoding: '7bit',
+  mimetype: 'image/png',
+  destination: 'uploads/',
+  filename: 'd77bd318085c3e86fcb2ffe031bc5eea',
+  path: 'uploads/d77bd318085c3e86fcb2ffe031bc5eea',
+  size: 1292080
+}
+```
+DB에는 path를 저장해 절대 file 자체를 저장하지마!
+
+그리고 uploads 파일 내용은 굳이 git에 올릴 필요 없으니 .gitignore에 추가
+
+#### enable static files serving
+폴더 전체를 브라우저에 노출 시켜야 이미지를 볼 수 있다
+우선 이미지를 보기 위해서는 아래처럼 template에 적용
+```
+img(src="/" + loggedInUser.avatarUrl, width="100", height="100")
+```
+
+해당 이미지를 출력하기 위해서 아래처럼 server에 적용
+```
+app.use("/uploads", express.static("uploads"));
+```
+static 안에는 root directory를 넣는다
+
+### 우리 file upload의 문제점
+1. 서버에 저장한다.
+서버가 재시작 할 때마다 이전 서버에 있던 내용은 날아갈거야.
+서버가 두 개 필요하면 어떡해? 그럼 uploads를 공유하게 할 거야? 아니면 replica를 만들거야?
+-> 파일을 우리 서버에 저장하는 게 아니라 다른 곳에 저장한다.
+서버가 사라졌다 다시 돌아와도 파일이 안전하게 저장되어 있을 수 있도록.
+
+2. DB에 절대 file을 저장하면 안돼. path를 저장해야해!!
+원본은 hard driver나 amazone 같은 데 저장하면 된다.

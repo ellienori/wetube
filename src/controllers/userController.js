@@ -147,13 +147,15 @@ export const postEdit = async (req, res) => {
     session: {
       user: {
         _id,
+        avatarUrl,
         username: _username,
         email: _email,
       },
     },
     body: { name, email, username, location },
+    file,
   } = req;
-  
+
   // username and email should be unique.
   // email이나 username이 _username 랑 같으면 변화 없는 거야 
   // 다르면 unique check를 해야해
@@ -177,7 +179,11 @@ export const postEdit = async (req, res) => {
   }
 
   const updatedUser = await User.findByIdAndUpdate(_id, {
-    name, email, username, location
+    avatarUrl: file ? file.path : avatarUrl,
+    name, 
+    email, 
+    username, 
+    location,
   }, { new: true });
 
   req.session.user = updatedUser;
