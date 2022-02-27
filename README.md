@@ -2049,3 +2049,32 @@ webpack은 자동으로 webpack.config.js를 부르기 때문에
   "dev:assets": "webpack"
 },
 ```
+
+# #10 STYLES
+## #10.0 Introduction
+scss와 html 작업을 할 예정
+
+### Basic structure
+1) 우리는 pug 기반의 views를 만들었고 MVP css를 사용하고 있다.
+MVP css를 지울 거야. (base.pug에서)
+
+2) font-awesome 설치
+https://cdnjs.com/libraries/font-awesome로 이동해서 고른다음에 base.pug에 적용
+```
+link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+```
+pug에서 아래처럼 쓰면 유투브 로고가 나온다
+```
+i.fab.fa-youtube
+```
+
+3) client/scss 아래에 components와 screens 생성
+components: partials(headers, footers, ...)나 mixins을 만들면 여기에 scss를
+screens: view template(home, search, ...)를 만들면 여기에 
+
+그리고 _variables.scss를 config 아래로 옮김
+
+_reset.scss를 만들고 https://meyerweb.com/eric/tools/css/reset 에서 내용을 가져옴
+모든 설정을 0으로 바꿔주는 애야 (no padding, no margin, ...)
+
+4) base.pug에서 header를 분리하고 partials/header와 footer와 이름이 똑같은 scss를 components 아래에 생성한다.
