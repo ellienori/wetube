@@ -21,7 +21,7 @@ dendencies 프로젝트를 실행하기 위한 것 (운전 시 가솔린 필요�
 devDendencies 개발자에게 필요한 것 (운전 시 음악 필요함ㅋ)
 
 ## Express
-
+Node.js 웹 어플리케이션 프레임워크
 ```
 $ npm i express
 ```
@@ -41,8 +41,8 @@ $ npm i --save-dev @babel/core @babel/node
 $ npm i @babel/preset-env --save-dev
 ```
 
-devDependency를 위해 --save-dev로 설치하는 거임
-만약 잘못 설치했으면 그냥 package.json에서 수정ㅇ하면 돼 그냥 text file 이잖아 ㅎ ㄱㅊㄱㅊ
+devDependency를 위해 --save-dev로 설치하는 거임 (-D)
+만약 잘못 설치했으면 그냥 package.json에서 수정ㅇ하면 돼 그냥 text file 이잖아 ㄱㅊㄱㅊ
 
 preset? babel plugin 종류 되게 다양함
 
@@ -64,28 +64,25 @@ $ vim package.json
 우리가 매번 npm run dev 할 필요 없어
 
 참고: https://www.npmjs.com/package/nodemon
-
+### 설치
 ```
 $ npm install --save-dev nodemon
 ```
-
 ### Setting
-
 ```
 $ vim package.json
 "dev": "nodemon --exec babel-node index.js"
 ```
 
 # #2 Introduction to express
-
 ## GET Request (http request)
 
 Cannot GET /
 Browser: get '/' page.
 라는 뜻인데 root 페이지('/')를 지금 열 수 없다는 뜻
-
+```
 apt.get(routes, controller)
-
+```
 ## Request / Response
 
 browser가 website(server)로 request를 보내고 server는 그에 대한 response를 줘야지
@@ -96,15 +93,13 @@ response는 status code, html, .....
 middle software between request and response
 
 ### morgan
-
 설치해서 쓴 예시 중에 하나
-
 ```
 npm i morgan
+
 import morgan from "morgan";
 app.use(morgan("dev"));
 ```
-
 morgan을 쓰면 middleware가 더 정교하게 표현된다.
 종류는 총 5개 combined, common, dev, short, tiny
 
@@ -122,7 +117,6 @@ app.use(morgan("dev"));
 ```
 
 ## Router
-
 Router는 controller와 url 관리를 쉽게 해줌. 미니 어플리케이션
 
 ### Plan
@@ -146,7 +140,6 @@ Router는 controller와 url 관리를 쉽게 해줌. 미니 어플리케이션
   /videos/upload -> Upload Video
 
 ### Source code
-
 ```
 (구버전)
 // http request. app.lisen 하기 전에 설정해야 함
@@ -163,7 +156,6 @@ app.get("/login", (req, res) => {
 ```
 
 ### Parameter (#4.7~4.8)
-
 ```
 // :${parameter}
 videoRouter.get("/upload", upload);
@@ -233,13 +225,11 @@ include partials/footer.pug
 base.pug를 만들고 extends 하기
 
 #### Step 1. 써먹을 base.pug 만들기
-
 ```
 block content
 ```
 
 #### Step 2. 필요한 곳에서 상속 받기
-
 ```
 extends base.pug
 
@@ -248,9 +238,7 @@ block content
 ```
 
 ### Variables
-
 계속 비슷한 template이면 변수만 넘겨서 설정하자
-
 ```
 # base.pug 에 이렇게 설정
 head
@@ -266,9 +254,9 @@ res.render("home", { pageTitle: "Home ☀"}
 
 ## #5.9 Mixins (pug references)
 
-반복되는 partial 같은 애야. smart partial
-mixins 디렉토리를 만들고 그 안에 video.pug 파일을 생성
-info라는 정보를 받아와서 어떻게 출력하겠다 라는 의미
+* 반복되는 partial 같은 애야. (smart partial)
+* mixins 디렉토리를 만들고 그 안에 video.pug 파일을 생성
+* info라는 정보를 받아와서 어떻게 출력하겠다 라는 의미
 
 ```
 mixin video(info)
@@ -310,17 +298,14 @@ const id = req.params.id;
 ```
 
 ### ternary operation
-
-```(watch.pug)
+watch.pug
+```
 #{video.views === 1 ? "view" : "views"}
 ```
 
 ## #6.2~6.3 Edit
-
 ### POST, GET 이해하기
-
 #### GET
-
 구글이나 네이버에 검색할 때 다음에 'search?검색어' 이런 식으로 url에 넘어가잖아
 그럴 때 GET을 쓰는 거임
 그리고 얘는 default라 따로 method 설정 안해주면 get으로 되어 있음
@@ -328,49 +313,44 @@ const id = req.params.id;
 wetube에서는 비디오 검색할 때 사용
 
 #### POST
+파일을 보내거나 DB에 있는 값을 바꾸는(수정/삭제) 뭔가를 보낼 때 사용, 로그인 할 때도 사용
 
-파일을 보내거나 DB에 있는 값을 바꾸는(수정/삭제) 뭔가를 보낼 때 사용
-로그인 할 때도 사용
-
-```(edit.pug)
+edit.pug
+```
 form(method="POST")
 ```
 
-하지만 저렇게 선언한다고 해서 우리 서버가 이해하고 있는 거 아니니까
-router에도 알려줘야해
+하지만 저렇게 선언한다고 해서 우리 서버가 이해하고 있는 거 아니니까 router에도 알려줘야해
 
-```(videoRouter.js)
+videoRouter.js
+```
 videoRouter.get("/:id(\\d+)/edit", getEdit);
 videoRouter.post("/:id(\\d+)/edit", postEdit);
 ```
 
 근데 위에서 처럼 두 줄로 쓰지말고 아래처럼 하나로
-
 ```
 videoRouter.route("/:id(\\d+)/edit").get(getEdit).post(postEdit);
 ```
 
 ##### express가 form을 이해하게 하려면
-
-```(server.js)
+server.js
+```
 app.use(express.urlencoded({extended: true}));
 ```
-
-router 연결되기 전에 적어야함
-저래야 form의 value를 이해할 수 있음
+router 연결되기 전에 적어야 form의 value를 이해할 수 있음
 form을 javascript가 이해할 수 있도록 변환해주는 middleware임
 
-```(videoController.js의 postEdit 함수)
+videoController.js의 postEdit 함수
+```
 console.log(req.body);
 ```
 
 그럼 이제 form에 적은 내용이 넘어옴
 form의 name이 title이기 때문에 콘솔창에 데이터가
-
 ```
 { title: 'New Video' }
 ```
-
 라고 넘어옴
 
 ## #6.4 Recap
@@ -481,14 +461,14 @@ const videoSchema = new mongoose.Schema({
 ```
 데이터 형태가 어떻게 생겼는지 설정한다.
 
-#### 모델 생성
+### 모델 생성
 위에서 생성한 스키마를 기반으로 모델을 생성한다.
 ```
 const movieModel = mongoose.model("Video", videoSchema); // model 이름을 Video로 함
 export default movieModel; // export
 ```
 
-그리고 서버(server.js)에 import 해줘야 함
+그리고 필요한 곳에 import 해줘야 함 - 여기서는 server에 했으나 뒤에서 init으로 옮김
 ```
 import "./models/Video";
 ```
@@ -498,7 +478,9 @@ import "./models/Video";
 ### server.js와 init.js 분리
 server.js는 express 관련된 것과 server의 configuration에 관련된 내용만 다루고
 init.js는 DB나 model등을 import하는 내용을 담음
-``` // init.js
+
+init.js
+```
 import "./db";
 import "./models/Video";
 import app from "./server";
@@ -510,7 +492,7 @@ app.listen(PORT, () => { // create a server
   console.log(`Server listening on http://localhost:${PORT} 🚀`);
 });
 ```
-nodemon 설정을 위해 server.js를 실행시키는 부분을 init.js로 바꾸기
+그리고 nodemon 설정을 위해 server.js를 실행시키는 부분을 init.js로 바꾸기
 
 ### Model 사용
 이제 controller에서 fake data(array) 다 지우고
@@ -521,7 +503,7 @@ Model.find()은 callback 함수로 쓸 수도 있고 promise로 쓸 수 있는�
 우선 모든 비디오 데이터를 가지고 오는 것이 목표
 
 mongoose는 Video.find({}, // 여기에서 이미 db를 가지고 올거고
-그 db가 바응하면 뒤의 function을 실행시킬 거야.
+그 db가 반응하면 뒤의 function을 실행시킬 거야.
 ```
 Video.find({}, (err, videos) => {
     
@@ -530,7 +512,8 @@ Video.find({}, (err, videos) => {
 앞의 {}은 search terms를 의미하는데 얘가 비어있으면 모든 형식을 찾는다는 것을 의미
 
 #### callback이랑 promise 비교
-``` // callback
+* callback
+```
 export const home = (req, res) => {
   Video.find({}, (err, videos) => {
     return res.render("home", { pageTitle: "Home ☀", videos });
@@ -538,7 +521,8 @@ export const home = (req, res) => {
 };
 ```
 
-``` // promise
+* promise (async/await)
+```
 export const home = async (req, res) => {
   const videos = await Video.find({});
   return res.render("home", { pageTitle: "Home ☀", videos });
@@ -546,7 +530,10 @@ export const home = async (req, res) => {
 ```
 
 ## #6.16
-video.save(); 에서 save는 promise를 리턴하기 때문에 save 작업이 끝날 때까지 기다려야 함
+```
+video.save();
+```
+에서 save는 promise를 리턴하기 때문에 save 작업이 끝날 때까지 기다려야 함
 
 ### DB 확인하기 (MongoDB에서)
 ```
@@ -587,8 +574,8 @@ videos
 ```
 
 ### DB 저장하기 save -> create
-기존 방법
-```
+* Before
+```javascript
 const video = new Video({
   title,
   description,
@@ -604,8 +591,8 @@ const video = new Video({
 await video.save();
 ```
 
-새 방법
-```
+* After
+```javascript
 await Video.create({
   title,
   description,
@@ -635,13 +622,12 @@ createdAt: { type: Date, required: true },
 ```
 createdAt: { type: Date, required: true, default: Date.now },
 ```
-Date.now()로 하면 즉시 실행되는 것 주의
+__Date.now()__ 로 하면 즉시 실행되는 것 주의
 
 ## #6.19 Video detail
-
 ### 정규식
-정규식 연습할 수 있는 사이트 https://regex101.com/
-정규식에 대한 MDN의 공식 문서 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions
+* 정규식 연습할 수 있는 사이트 <https://regex101.com/>
+* 정규식에 대한 MDN의 공식 문서 <https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Regular_Expressions>
 
 기존에 라우터에서 id가 숫자라 생각해서 숫자로 정규식표현 해놨는데 
 ```
@@ -649,16 +635,15 @@ videoRouter.get("/:id(\\d+)", watch);
 ```
 이제 mongoDB에서 생성해주는 string id 값이니까 수정해줘야함
 
-mongoDB에서 생성하는 id는 16진수 24글자 string
-[0-9a-f]{24}
+>mongoDB에서 생성하는 id는 16진수 24글자 string
+>[0-9a-f]{24}
 ```
 videoRouter.get("/:id([0-9a-f]{24})", watch);
 ```
 
 ## #6.20~ Edit Video
-
 ### postEdit
-기존
+* Before
 ```
 video.title = title;
 video.description = description;
@@ -666,7 +651,7 @@ video.hashtags = hashtags.split(",")
 .map((word) => word.trim().startsWith("#") ? word.trim() : `#${word.trim()}`);
 await video.save();
 ```
-New
+* After
 ```
 await Video.findByIdAndUpdate(id, {
   title,
@@ -683,9 +668,10 @@ await Video.findByIdAndUpdate(id, {
 const video = await Video.findById(id);
 ```
 이럴 필요 없이 존재 유무만 먼저 판단하는 것이 더 좋다.
-Model.exists()는 인자로 filter를 받기 때문에 조건을 넣어줌
-결과는 true of false
-(참고) postEdit에선ㄴ 이렇게 쓰지만 getEdit에서는 object를 직접 가져와야 함
+
+__Model.exists()__ 는 인자로 filter를 받기 때문에 조건을 넣어줌 결과는 true of false
+
+*(참고) postEdit에선 이렇게 쓰지만 getEdit에서는 object를 직접 가져와야 함*
 ```
 const video = await Video.exists({_id: id});
 ```
@@ -693,10 +679,10 @@ const video = await Video.exists({_id: id});
 ## #6.23 Mongoose middlewares
 Model에서 설정할거니까 Video.js에서 확인할 것
 
-middleware는 model이 생성되기 전에 설정되어야 함
-middleware 안에 넘기는 함수에서 this는 document를 의미함
-즉 내가 새 비디오를 업로드하면 새 비디오 데이터가 this에 들어가있음
-pre.('save') 즉 save 전(previous)에 동작하는 미들웨어라는 뜻
+middleware는 model이 생성되기 전에 설정되어야 함   
+middleware 안에 넘기는 함수에서 this는 document를 의미함   
+즉 내가 새 비디오를 업로드하면 새 비디오 데이터가 this에 들어가있음   
+pre.('save') 즉 save 전(previous)에 동작하는 미들웨어라는 뜻   
 ```
 videoSchema.pre('save', async function() {
   // this refers to the document
@@ -704,8 +690,8 @@ videoSchema.pre('save', async function() {
 
 const movieModel = mongoose.model("Video", videoSchema);
 ```
-근데 얘는 upload에서는 먹히는데 edit에서 안먹혀
-왜냐면 findoneandupdate에서는 this로 document에 접근할 수 없기 때문이야
+근데 얘는 upload에서는 먹히는데 edit에서 안먹혀   
+왜냐면 findoneandupdate에서는 this로 document에 접근할 수 없기 때문이야   
 
 ## #6.24 statics
 
@@ -726,9 +712,9 @@ await Video.findByIdAndUpdate(id, {
 ```
 
 ### Statics로 처리하는 방법
-static은 Model에서 쓸 수 있는 함수를 생성해주는 거야
-그래서 schema.static(함수 이름, 함수) 형태로 되어 있음
-사용은 Video.formatHashtags(hashtags)
+static은 Model에서 쓸 수 있는 함수를 생성해주는 거야   
+그래서 *schema.static(함수 이름, 함수)* 형태로 되어 있음   
+사용은 Video.formatHashtags(hashtags)   
 ```
 videoSchema.static('formatHashtags', function(hashtags) {
   return hashtags
@@ -769,10 +755,10 @@ const videos = await Video.find({}).sort({createdAt: -1});
 ```
 
 ### search page
-search page를 만든다면 어디에 설정해야할까? -> global router
+search page를 만든다면 어디에 설정해야할까? -> __global router__
 
 #### 1. setting
-global router에 search 추가, video controller에 search 생성
+global router에 search 추가, video controller에 search 생성   
 search 뷰 추가 - 그 전에 base.pug에 search로 가는 메뉴도 추가
 
 #### 2. regex
@@ -793,25 +779,23 @@ videos = await Video.find({
 "i"는 대소문자를 구분하지 않음을 의미 (모두 검색)
 
 만약에 keyword로 시작하는 애를 찾고 싶으면
-new RegExp(`^${keyword}`, "i")
+>new RegExp(`^${keyword}`, "i")
 
 keyword로 끝나는 애를 찾고 싶으면
-new RegExp(`${keyword}$`, "i")
+>new RegExp(`${keyword}$`, "i")
 
 # #7 User Authentication
 
 ## #7.0~ Create account
 
 ### Setting
-models/User.js 생성
-init에서 import User
-
-rootRouter에 join 관련 route 추가
-userController에 join 관련 컨트롤러 추가 (postJoin, getJoin)
-join.pug view 생성
+* models/User.js 생성 후 init에서 import User
+* rootRouter에 join 관련 route 추가
+* userController에 join 관련 컨트롤러 추가 (postJoin, getJoin)
+* join.pug view 생성
 
 ### password hashing
-해싱은 한방향이라서 1212 -> sdfdf가 된다고 해서 sdfdf -> 1212가 되는 거 아님
+해싱은 *한방향*이라서 1212 -> sdfdf가 된다고 해서 sdfdf -> 1212가 되는 거 아님
 같은 input으로는 항상 같은 output이 나옴 == deterministic function 결정 함수
 
 ```
@@ -827,13 +811,13 @@ userSchema.pre('save', async function() {
   this.password = await bcrypt.hash(this.password, 5);
 });
 ```
-middleware로 저장하기 전에 password를 hashing하기
+middleware로 저장하기 전에 password를 hashing하기   
 bcrypt.hasy(데이터, 횟수, 콜백함수) 하지만 우린 async await라 콜백함수 X
 
 ## #7.3 Form validation
 ### Unique 값 처리하기
-기존
-```
+* Before
+```javascript
 // username and email should be unique.
 const usernameExists = await User.exists({username});
 if (usernameExists) {
@@ -845,8 +829,8 @@ if (emailExists) {
 }
 ```
 
-after
-```
+* After
+```javascript
 // username and email should be unique.
 const exists = await User.exists({$or: [{username}, {email}]});
 if (exists) {
@@ -860,7 +844,8 @@ if (exists) {
 POST /join 200 50.066 ms - 910
 ```
 status code 200을 보내서 브라우저는 가입이 성공한 줄 알고 username/password를 저장할 거냐고 묻는다.
-그래서 우리는 가입이 성공했을 때만 200을 보내기로 할거야.
+
+그래서 우리는 가입이 성공했을 때만 200을 보내기로 할거야.   
 Bad request 400
 ```
 return res.status(400).render("join", { pageTitle: "Join", errorMessage: "This username or email is already taken."});
@@ -880,25 +865,24 @@ if (!ok) {
 ```
 
 ## #7.7~ Sessions and Cookies
-
 ### 쿠키?
-유저를 기억하는 방법 중 한 가지는 유저에게 쿠키를 보내주는 것
-쿠키를 이해하기 위해서는 세션에 대해 알아야 해
-쿠키? 단지 정보를 주고받는 방법
+유저를 기억하는 방법 중 한 가지는 유저에게 쿠키를 보내주는 것   
+쿠키를 이해하기 위해서는 세션에 대해 알아야 해   
+쿠키? 단지 정보를 주고받는 방법   
 
 ### 세션?
-session id는 쿠키에 저장된다. session은 쿠키에 저장되지 X
-session data는 server side에 저장된다. -> db에 따로 저장해야함 (뒤에서)
+session id는 쿠키에 저장된다. session은 쿠키에 저장되지 X   
+session data는 server side에 저장된다. -> db에 따로 저장해야함 (뒤에서)   
 
-백엔드와 브라우저 사이에 어떤 활동을 했는지를 기억하는 것
-백엔드와 브라우저 사이의 memory, history
+백엔드와 브라우저 사이에 어떤 활동을 했는지를 기억하는 것   
+백엔드와 브라우저 사이의 memory, history   
 이게 작동하려면 백엔드와 브라우저가 서로에 대한 정보를 갖고있어야 함
 
-로그인 페이지에서 http 요청을 하면 요청이 처리 되고 끝남
+로그인 페이지에서 http 요청을 하면 요청이 처리 되고 끝남   
 그 이후로는 백엔드가 아무 것도 할 수 없어
 
-내가 home을 누르면 get 요청(request)를 보냄
-백엔드가 html을 render하고 나면 연결이 끝남
+내가 home을 누르면 get 요청(request)를 보냄   
+백엔드가 html을 render하고 나면 연결이 끝남   
 연결이 계속 유지되지 않음. state가 없음
 
 그래서 유저가 로그인 할 때마다 누군지 알 수 있도록 텍스트 같은 걸 줄 거야
@@ -932,7 +916,7 @@ req.session.user = user;
 ```
 
 ### template <-> Controller 데이터 공유 ==> template(pug)에서 login 확인 하기
-res.locals를 사용하면 돼
+*res.locals*를 사용하면 돼   
 locals object는 이미 모든 pug template에 import된 object다.
 ```
 // server (router)
@@ -947,7 +931,7 @@ app.use((req, res, next) => {
 ${sexy} 라고만 쓰면 you가 나옴
 ```
 
-그런데 위처럼 쓸 수는 없으니 src/middlewares.js를 생성하고
+그런데 위처럼 쓸 수는 없으니 src/middlewares.js를 생성하고   
 그 안에 export로 middleware를 만든 다음에 server에서 아래처럼 추가
 ```
 // [session middleware]
@@ -969,8 +953,8 @@ else
 
 ## #7.12 MongoStore (connect-mongo)
 ### why mongodb?
-Session id is saved in the cookie.
-Session data is stored in the server-side, but only memory store,
+Session id is saved in the cookie.   
+Session data is stored in the server-side, but only memory store,   
 so we need to store session data in MongoDB.
 
 ### Installation & Settings
@@ -978,8 +962,7 @@ so we need to store session data in MongoDB.
 npm i connect-mongo
 ```
 
-설치 후 server.js에서 MongoStore로 import 한 다음에
-session 미들웨어에서 store 설정을 바꾼다.
+설치 후 server.js에서 MongoStore로 import 한 다음에 session 미들웨어에서 store 설정을 바꾼다.
 ```
 app.use(session({
   secret: "Hello!",
@@ -1000,7 +983,7 @@ app.use(session({
 ```
 여기서 의미하는 resave와 saveUninitialized => 모두 false로 변경
 
-join하지 않고 구경하는 모든 사람의 세션을 다 DB에 저장? 좋은 생각 아님
+join하지 않고 구경하는 모든 사람의 세션을 다 DB에 저장? 좋은 생각 아님   
 로그인 한 사용자의 session만 DB에 저장하도록 하자
 
 ### saveUninitialized
@@ -1011,19 +994,19 @@ req.session.loggedIn = true;
 req.session.user = user;
 ```
 
-세션을 수정할 때만 DB에 저장하고 쿠키를 넘겨준다.
+세션을 수정할 때만 DB에 저장하고 쿠키를 넘겨준다.   
 backend가 로그인한 사용자에게만 쿠키를 주도록 설정한다. (익명에게는 쿠키 안줌)
 
-backend가 DB에 저장하는 게 session 인증의 문제점 중 하나
-해결책: token authentication (cookie 없을 때는 token을 사용)
+backend가 DB에 저장하는 게 session 인증의 문제점 중 하나   
+*해결책: token authentication* (cookie 없을 때는 token을 사용)
 
 ## #7.14 Expiration and secrets
 ### Secret
 - 어디에 있어? server.js에서 session 등록할 때 첫 번째 값
 - 이게 뭐야?
-우리가 쿠키에 sign 할 때 사용하는 string (혹은 array)
-sign 하는 이유? 우리 backend가 쿠키를 줬다는 걸 보여주기 위해서
-(session hijack 방지: 누가 내 세션 훔쳐서 나인척 할 수 있어)
+  + 우리가 쿠키에 sign 할 때 사용하는 string (혹은 array)
+  + sign 하는 이유? 우리 backend가 쿠키를 줬다는 걸 보여주기 위해서
+  + session hijack 방지: 누가 내 세션 훔쳐서 나인척 할 수 있어
 
 ### Domain
 - web browser에서 Application > Cookies 보면 Value 옆에 Domain이 있음
@@ -1056,11 +1039,10 @@ app.use(session({
 cookie는 밀리세컨드 단위라서 20초 후로 설정함
 
 ### 어쨌든 우리는
-session에서 secret이랑 mongoDB url을 이렇게 string으로 넣어서는 안된다.
+session에서 secret이랑 mongoDB url을 이렇게 string으로 넣어서는 안된다.   
 그래서 .env를 생성하고 .gitignore에도 추가한다 (공개되지 않도록)
 
 #### .env
-
 ##### Installation & Setting
 ```
 npm i dotenv
@@ -1078,52 +1060,50 @@ import "dotenv/config";
 
 ##### .env 파일 내용
 관습적으로 모두 대문자로 적음
-사용은 process.env.COOKIE_SECRET 이렇게
+사용은 *process.env.COOKIE_SECRET*
 
 ## #7.16~ github login
 ### flow
 > 참고: https://docs.github.com/en/developers/apps/building-oauth-apps
 
-1. 사용자를 깃헙으로 보내 (redirect to github) -> https://github.com/login/oauth/authorize
+1. 사용자를 깃헙으로 보내 (redirect to github) -> <https://github.com/login/oauth/authorize>   
   해당 내용을 login.pug에 추가함, client_id는 아래 OAuth 생성하기 참고
   ```
   a(href="https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4") Continue with Github &rarr;
   ```
 
-  그런데 위에 처럼해서 진행하면 public data만 받아오게 됨. 우리는 사용자 email 등의 더 많은 데이터를 원해
+  그런데 위에 처럼해서 진행하면 public data만 받아오게 됨. 우리는 사용자 email 등의 더 많은 데이터를 원해   
   scope을 사용할거야. 자세한 내용은 아래 scope 참고
-
 2. 그럼 사용자는 깃헙에 이메일과 비밀번호를 넣고 우리에게 정보를 공유하는 것을 승인할거야 (Authorize)
 3. 그럼 깃헙은 사용자를 우리 사이트로 돌려보냄 + token과 함께 redirect
 
 ### step 1
 #### OAuth 생성하기
-github.com/settings/apps > OAuth Apps > Create
+<github.com/settings/apps> > OAuth Apps > Create
 
-Application name: Wetube
-Homepage URL: http://localhost:4000/
-Application description: Wetube Reloaded
-Authorization callback URL: http://localhost:4000/users/github/finish
+>Application name: Wetube
+>Homepage URL: http://localhost:4000/
+>Application description: Wetube Reloaded
+>Authorization callback URL: http://localhost:4000/users/github/finish
 
 URL에 해당 내용은 우리가 저렇게 정한 거임
 
 #### scope
-scope에는 우리가 사용자에 대해 어디까지 알 수 있는지 적으면 된다.
-유저에게서 얼마나 많은 정보를 읽어내고 어떤 정보를 가져올 것에 대한 것
+* scope에는 우리가 사용자에 대해 어디까지 알 수 있는지 적으면 된다.   
+  + 유저에게서 얼마나 많은 정보를 읽어내고 어떤 정보를 가져올 것에 대한 것
+* 참고로 카톡에서는 permission 이라고 표현한다.
+* 여러 개의 scope를 입력할 때는 *띄어쓰기*로 하면 된다.
 
-참고로 카톡에서는 permission 이라고 표현한다.
+* allow_signup: user가 github에 계정이 없다면 생성할 수 있게 할래? 아니면 계정이 이미 있는 사람들만 로그인하게 할래?
+  + default: true
 
-여러 개의 scope를 입력할 때는 띄어쓰기로 하면 된다.
-
-allow_signup: user가 github에 계정이 없다면 생성할 수 있게 할래? 아니면 계정이 이미 있는 사람들만 로그인하게 할래? (default: true)
-
-https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4&allow_signup=false&scope=user:email
+>https://github.com/login/oauth/authorize?client_id=5584aeba81be37dea8a4&allow_signup=false&scope=user:email
 url이 너무 길어서 아래처럼 임의로 정함 (login.pub)
 ```
 a(href="/users/github/start") Continue with Github &rarr;
 ```
-그리고 router와 controller에 startGithubLogin 생성
-controller에서 URLSearchParams 사용
+그리고 router와 controller에 startGithubLogin 생성   
+controller에서 *URLSearchParams* 사용
 
 config 오브젝트 생성할 때 key값을 url에 있는 거 그대로 사용해야 함
 ```
@@ -1143,37 +1123,36 @@ export const startGithubLogin = (req, res) => {
 
 ### step 2
 #### authorize
-사용자가 login > github login > 후 authorize 누르면 /users/github/finish 로 redirect 된다.
-그리고 뒤에 ?code=어쩌고 도 함께 보내줌
+사용자가 login > github login > authorize 누르면 /users/github/finish 로 redirect 된다.   
+그리고 뒤에 *?code=어쩌고* 도 함께 보내줌
 
 #### access_token
-github에서 받은 code를 access 토큰으로 바꿔줘야 해
+* github에서 받은 code를 access 토큰으로 바꿔줘야 해
 > POST https://github.com/login/oauth/access_token
 
-필요한 것 (required)
-code: url에 있음
-client_id: oauth 생성할 때 받음 -> .env에 넣을 거야
-client_secret: 말 그대로 비밀임. 오로지 backend에만 존재해야 함. github에서 generate 할 수 있고 .env에 넣음
+* 필요한 것 *required*
+  + code: url에 있음
+  + client_id: oauth 생성할 때 받음 -> .env에 넣을 거야
+  + client_secret: 말 그대로 비밀임. 오로지 backend에만 존재해야 함. github에서 generate 할 수 있고 .env에 넣음
 
-finishGithubLogin 함수 생성
-여기서 redirect 안하고 post로 url을 보낼거야
+* finishGithubLogin 함수 생성
+  + 여기서 redirect 안하고 post로 url을 보낼거야
 
 #### fetch
-fetch 뭔가를 하고 싶거나 뭔가를 가져오고 싶을 때 쓴다.
+fetch 뭔가를 하고 싶거나 뭔가를 가져오고 싶을 때 쓴다.   
 POST: 우리가 url에 뭔가를 보내고 있다!
 
 ##### fetch 할 때 넣는 {} 의 의미
+* HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 한다.
 
-HTTP headers는 는 클라이언트와 서버가 request(or response)로 부가적인 정보를 전송할 수 있도록 해줍니다
+* Accept
+  + 돌려줄 데이터 타입에 대해 서버에게 알려주는 역할
+  + MIME 타입입니다
+    + MIME type이란 웹에서 사용되는 확장자
+    + type/subtype으로 구성
 
-Accept
-돌려줄 데이터 타입에 대해 서버에게 알려주는 역할을 합니다
-MIME 타입입니다
-(📌MIME type이란 웹에서 사용되는 확장자라고 생각하시면 되며
-type/subtype으로 구성되어 있습니다)
-
-Authorization
-보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할을 합니다
+* Authorization
+  + 보호된 리소스에 대한 접근을 허용하여 서버로 User agent를 인증하는 자격증명을 보내는 역할
 
 ##### fetch 설치 및 사용
 nodejs에서 fetch를 사용하려면 우선 설치부터 해야함
@@ -1195,7 +1174,7 @@ const data = await fetch(finalUrl, {
 const json = await data.json();
 res.send(JSON.stringify(json));
 ```
-await로 하나씩 값을 기다려서 가져오고 마지막에 res.send를 쓰면 json을 그냥 화면에 뿌려준다.
+await로 하나씩 값을 기다려서 가져오고 마지막에 res.send를 쓰면 json을 그냥 화면에 뿌려준다.   
 값 확인하기 좋음
 
 ### step 3
@@ -1223,7 +1202,7 @@ console.log(userRequest);
 ```
 email: null,
 ```
-해당 데이터가 정말 없거나 private 하다는 것을 의미
+해당 데이터가 정말 없거나 private 하다는 것을 의미   
 그런데 우리가 scope에 값을 2개를 넣었는데 지금 read:user만 가져와서 이런 거야
 
 #### email 가져오기
@@ -1261,10 +1240,11 @@ const email = emailData.find(value => value.primary === true && value.verified =
 ```
 
 ### Login Rules
-github에서 주는 primary/verifed email이 이미 등록된 email 일 때 -> 로그인 시켜주자
-                                                        -> 없으면 계정 생성하라고 하자 (우리 이미 user 정보 있어서 만들면 돼)
+* github에서 주는 primary/verifed email이 이미 등록된 email 일 때
+  + 로그인 시켜주자
+  + 없으면 계정 생성하라고 하자 (우리 이미 user 정보 있어서 만들면 돼)
 
-github으로 로그인했는지 여부 파악을 위해 User model에 변수 추가
+* github으로 로그인했는지 여부 파악을 위해 User model에 변수 추가
 ```
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -1276,8 +1256,7 @@ const userSchema = new mongoose.Schema({
 });
 ```
 
-만약 일반 로그인을 하는 사람이라면 password를 체크해야하니까
-postLogin에 아래처럼 추가
+만약 일반 로그인을 하는 사람이라면 password를 체크해야하니까 postLogin에 아래처럼 추가
 ```
 const user = await User.findOne({username, socialOnly: false}); // 그래야 password 체크를 하지
 ```
@@ -1307,7 +1286,7 @@ res.locals.loggedInUser = req.session.user || {};
 undefined 일 경우 빈 오브젝트를 넣도록 middlewares에서 설정
 
 ### 로그인하지 않은 사람들이 우리가 보호하려는 페이지에 접근하는 걸 막자
-```
+```javascript
 // protect pages
 export const protectorMiddleware = (req, res, next) => {
   // if user is not logged in, redirect to login page.
@@ -1328,9 +1307,9 @@ export const publicOnlyMiddleware = (req, res, next) => {
   }
 }
 ```
-middleware에 두 개의 함수 추가.
-- protectorMiddleware: 사용자가 로그인하지 않았다면 로그인 페이지로 안내한다.
-- publicOnlyMiddleware: 사용자가 로그인했으면 로그인을 요구하지 않고 홈으로 이동시킨다.
+* middleware에 두 개의 함수 추가.
+  + protectorMiddleware: 사용자가 로그인하지 않았다면 로그인 페이지로 안내한다.
+  + publicOnlyMiddleware: 사용자가 로그인했으면 로그인을 요구하지 않고 홈으로 이동시킨다.
 
 #### router에 적용하기
 ```
@@ -1339,7 +1318,7 @@ userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
 userRouter.get("/github/start", publicOnlyMiddleware, startGithubLogin);
 userRouter.get("/github/finish", publicOnlyMiddleware, finishGithubLogin);
 ```
-get과 post, delete 등에 적용하고 싶으면 .all()을 사용하면 된다.
+get과 post, delete 등에 적용하고 싶으면 *.all()*을 사용하면 된다.   
 userRouter 외에도 다른 router에 적용할 것
 
 ## #8.2~ Edit profile POST
@@ -1361,7 +1340,8 @@ const {
 ### DB는 업데이트 되었으나 session은 업데이트가 안돼
 왜냐면 session은 로그인 할 때 업데이트되어서 그래
 
-- 첫번째 방법: 직접 수정하기
+* 첫번째 방법: 직접 수정하기
+  + form이랑 일치하는 데이터는 업데이트하고 그 외에 것은 req.session.user로 가져오겠다는 뜻
 ```
 await User.findByIdAndUpdate(_id, {
   name, email, username, location
@@ -1375,11 +1355,9 @@ req.session.user = {
   location,
 }
 ```
-form이랑 일치하는 데이터는 업데이트하고 그 외에 것은 req.session.user로 가져오겠다는 뜻
 
-- 두번째 방법: updatedUser 생성하기
-findByIdAndUpdate 함수에서 new:true를 설정하면 업데이트 된 값을 return 해주고
-그러지않으면 업데이트 전의 값을 return 해준다.
+* 두번째 방법: updatedUser 생성하기
+  + findByIdAndUpdate 함수에서 *new:true*를 설정하면 업데이트 된 값을 return 해주고 그러지않으면 업데이트 전의 값을 return 해준다.
 ```
 const updatedUser = await User.findByIdAndUpdate(_id, {
   name, email, username, location
@@ -1440,8 +1418,7 @@ if !loggedInUser.socialOnly
   a(href="change-password") Change Password &rarr;
 ```
 
-- 두번째 방법: form을 볼 수는 있지만 사용하지 못하게 하기
-안함
+~~ - 두번째 방법: form을 볼 수는 있지만 사용하지 못하게 하기 ~~
 
 ### password 변경 처리
 비밀번호를 저장하려면 User.js에서 user create 될 때 pre("save")를 썼었는데 걔를 user save 할 때도 쓸 수 있도록 할거야
@@ -1459,8 +1436,8 @@ form(method="POST")
   label(for="avatar") Avatar
   input(type="file", id="avatar", name="avatar", accept="image/*")
 ```
-edit-profile.pug에 위처럼 추가
-accept를 넣어 Image file만 불러올 수 있게 한다.
+edit-profile.pug에 위처럼 추가   
+*accept*를 넣어 Image file만 불러올 수 있게 한다.
 
 ### Step 2. middleware 사용하기 -> multer
 #### 설치
@@ -1492,16 +1469,16 @@ userRouter.js의 edit에 적용한다.
 기본 사용법은
 >app.post(url, middleware, controller function)
 
-Before
+* Before
 ```
 userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(postEdit);
 ```
 
-After - post에 적용
+* After - post에 적용
 ```
 userRouter.route("/edit").all(protectorMiddleware).get(getEdit).post(uploadFilesMiddleware.single("avatar"), postEdit);
 ```
-input으로 avatar 파일을 받아서 (single? 여러개 받을 때도 있기 때문) uploads 폴더에 저장한 다음
+input으로 avatar 파일을 받아서 (single? 여러개 받을 때도 있기 때문) uploads 폴더에 저장한 다음   
 그 파일 정보를 postEdit에 전달한다. 이렇게 하면 req에 req.file이 추가 된다.
 
 req.file 찍어보면
@@ -1517,12 +1494,11 @@ req.file 찍어보면
   size: 1292080
 }
 ```
-DB에는 path를 저장해 절대 file 자체를 저장하지마!
-
+__DB에는 path를 저장해 절대 file 자체를 저장하지마!__   
 그리고 uploads 파일 내용은 굳이 git에 올릴 필요 없으니 .gitignore에 추가
 
 #### enable static files serving
-폴더 전체를 브라우저에 노출 시켜야 이미지를 볼 수 있다
+폴더 전체를 브라우저에 노출 시켜야 이미지를 볼 수 있다   
 우선 이미지를 보기 위해서는 아래처럼 template에 적용
 ```
 img(src="/" + loggedInUser.avatarUrl, width="100", height="100")
@@ -1536,13 +1512,13 @@ static 안에는 root directory를 넣는다
 
 ### 우리 file upload의 문제점
 1. 서버에 저장한다.
-서버가 재시작 할 때마다 이전 서버에 있던 내용은 날아갈거야.
-서버가 두 개 필요하면 어떡해? 그럼 uploads를 공유하게 할 거야? 아니면 replica를 만들거야?
--> 파일을 우리 서버에 저장하는 게 아니라 다른 곳에 저장한다.
-서버가 사라졌다 다시 돌아와도 파일이 안전하게 저장되어 있을 수 있도록.
+  + 서버가 재시작 할 때마다 이전 서버에 있던 내용은 날아갈거야.
+  + 서버가 두 개 필요하면 어떡해? 그럼 uploads를 공유하게 할 거야? 아니면 replica를 만들거야?
+    + 파일을 우리 서버에 저장하는 게 아니라 다른 곳에 저장한다.
+    + 서버가 사라졌다 다시 돌아와도 파일이 안전하게 저장되어 있을 수 있도록.
 
 2. DB에 절대 file을 저장하면 안돼. path를 저장해야해!!
-원본은 hard driver나 amazone 같은 데 저장하면 된다.
+  + 원본은 hard driver나 amazone 같은 데 저장하면 된다.
 
 ## #8.9~ video upload
 ### 기본 세팅
@@ -1581,14 +1557,15 @@ li
 controller, router 등은 알아서 잘 하면 된다.
 
 ## #8.11~ Video owner
-지금은 video와 user가 연결되어 있지 않다 -> _id를 사용해야해 (super unique 하니까)
-users에는 user가 업로드한 모든 영상의 id를 저장할거고
+지금은 video와 user가 연결되어 있지 않다 -> _id를 사용해야해 (super unique 하니까)   
+users에는 user가 업로드한 모든 영상의 id를 저장할거고   
 videos는 해당 영상을 올린 user의 id를 저장할거야
 
 ### Step 1. Models에 적용하기
-Videos에 owner의 objectId 추가하기
-ObjectId는 JS에서 제공하는 type이 아니고 mongoose에서 제공하는 type임
-그리고 어떤 Model의 objectid인지 ref로 넣어줘야 함
+* Videos에 owner의 *objectId* 추가하기
+  + ObjectId는 JS에서 제공하는 type이 아니고 mongoose에서 제공하는 type임
+  + 그리고 어떤 Model의 objectid인지 *ref*로 넣어줘야 함
+Model
 ```
 owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref:"User" },
 ```
@@ -1610,16 +1587,16 @@ let owner = await User.findById(video.owner);
     };
   }
 ```
-위처럼 적용하고 render 할 때 owner를 함께 보내준다.
+위처럼 적용하고 render 할 때 owner를 함께 보내준다.   
 디비를 두 번이나 불러야해서 그리 좋은 방법은 아님
 
 ### Step 2-2. 혹은 ref 사용하기
-우리가 Videos Model에서 owner 정의할 때 ref를 넣었으니 걔를 써보도록 하자
+우리가 Videos Model에서 owner 정의할 때 ref를 넣었으니 걔를 써보도록 하자   
 mongoose는 owner에 저장된 objectId가 user에서 온 것을 알고있다.
 ```
 const video = await Video.findById(id).populate("owner");
 ```
-populate()는 실제 owner를 user로 채워준다
+*populate()*는 실제 owner를 user로 채워준다
 
 ```
 {
@@ -1659,7 +1636,7 @@ video의 owner가 params의 id와 같은 video를 찾을 거야
 const videos = await Video.find({owner: user._id});
 return res.render("users/profile", { pageTitle: user.name, user, videos });
 ```
-그리고 page를 render 할 때 video 정보를 함게 보내준다.
+그리고 page를 render 할 때 video 정보를 함게 보내준다.   
 비디오는 아래처럼 배열로 나온다.
 
 output:
@@ -1691,17 +1668,16 @@ block content
 ```
 
 ### Step 4-2. 혹은 populate
-Video는 하나의 owner를 가지고 owner는 여러 video를 가질 수 있다.
-그래서 User에 videos라는 array를 만들어주자.
+* Video는 하나의 owner를 가지고 owner는 여러 video를 가질 수 있다.   
+  + 그래서 User에 videos라는 array를 만들어주자.
 ```
 videos: [{ type: mongoose.Schema.Types.ObjectId, ref: "Video" }],
 ```
 
-이제 동영상을 업로드할 때마다 User에도 video id를 저장해줘야해
-videoController.js > postUpload
-
-create method는 새로 만드는 오브젝트를 return 해준다.
-따라서 await Video.create({})을 가져올 수 있다.
+* 이제 동영상을 업로드할 때마다 User에도 video id를 저장해줘야해
+  + videoController.js > postUpload
+  + create method는 새로 만드는 오브젝트를 return 해준다.   
+    + 따라서 await Video.create({})을 가져올 수 있다.
 
 Before
 ```
@@ -1735,8 +1711,8 @@ await Video.create({
 return res.redirect("/");
 ```
 
-그리고 user profile 보여주는 부분에 populate 설정하기
-userController > see
+* 그리고 user profile 보여주는 부분에 populate 설정하기
+  + userController > see
 ```
 export const see = async (req, res) => {
   const { id } = req.params;
@@ -1751,10 +1727,10 @@ export const see = async (req, res) => {
 
 ## #8.14 Bug fix
 ### 1. password hash bug
-user를 save 할 때마다 User.js의 userSchema.pre("save")에서 password를 매번 hashing 하고 있어.
-videoController에서 영상을 업로드할 때마다 user.save()를 실행하는데 그때마다 비번이 다시 hash 돼.
-그럼 사용자가 로그인 다시 못함..;;;;;;
-그래서 User.js에서 if문을 추가해서 password가 수정되었을 경우에만 hash 하도록 바꿈
+user를 save 할 때마다 User.js의 userSchema.pre("save")에서 password를 매번 hashing 하고 있어.   
+videoController에서 영상을 업로드할 때마다 user.save()를 실행하는데 그때마다 비번이 다시 hash 돼.   
+그럼 사용자가 로그인 다시 못함..;;;;;;   
+그래서 User.js에서 if문을 추가해서 password가 수정되었을 경우에만 hash 하도록 바꿈   
 ```
 userSchema.pre('save', async function() {
   if(this.isModified("password")) {
@@ -1782,19 +1758,17 @@ postEdit에도 위의 내용 추가
 # #9 WEBPACK - frontend
 
 ## #9.0 Introduction to Webpack
-현재 모든 JS는 backend에서 돌아감
+현재 모든 JS는 backend에서 돌아감   
 그래서 이제 Brower에서 JS 돌아가게 할거야
 
 ### Webpack
-package.json 보면 scripts에 우리가 지금 babel node 쓰고 있잖아
-그 덕에 node.js가 JS 이해할 거라고 확신할 수 있지
+package.json 보면 scripts에 우리가 지금 babel node 쓰고 있잖아   
+그 덕에 node.js가 JS 이해할 거라고 확신할 수 있지   
 즉, Backend JS는 Babel Node가 다 처리해준다.
 
-Frontend는? webpack 사용
-https://webpack.js.org/
+Frontend는? webpack 사용 <https://webpack.js.org/>
 
-근데 보통 webpack을 직접적으로 사용하지는 않고
-webpack을 포함하는 framework를 쓰게 될거야 (e.g. react, vue, next, ...)
+근데 보통 webpack을 직접적으로 사용하지는 않고 webpack을 포함하는 framework를 쓰게 될거야 (e.g. react, vue, next, ...)   
 그래서 아마 configuration을 현업에서 직접 다룰 일은 없을 거다
 
 ## #9.1~ Webpack Configuration
@@ -1803,20 +1777,21 @@ webpack을 포함하는 framework를 쓰게 될거야 (e.g. react, vue, next, ..
 ```
 npm i webpack webpack-cli -D
 ```
-우리가 webpack에 알려줄 내용은 "여기에 source files이 있고 이 곳이 네가 결과물을 보낼 폴더야."
+우리가 webpack에 알려줄 내용은 *"여기에 source files이 있고 이 곳이 네가 결과물을 보낼 폴더야."*
 즉 우리가 코딩 할 곳은 src/client/js 고 browser가 읽을 곳은 assets/js 다.
 
 ### webpack.config.js
-해당 파일 생성. 이 파일은 구식 JS 문법만 이해할 수 있어
-import, export 이런 명령어 이해 못함
+* 해당 파일 생성
+  + 이 파일은 구식 JS 문법만 이해할 수 있어
+  + import, export 이런 명령어 이해 못함
 
-webpack.config에 필요한 내용 2가지
-1) entry
-우리가 처리하고자 하는 파일을 의미 e.g. Sexy JS
-entry를 webpack에게 넘겨줘야하는데 src/client 아래에 있는 파일을 entry라고 하자
-src/client/js/main.js 생성
-2) output
-어디에 결과물이 나올지
+* webpack.config에 필요한 내용 2가지
+  + entry
+    + 우리가 처리하고자 하는 파일을 의미 e.g. Sexy JS
+    + entry를 webpack에게 넘겨줘야하는데 src/client 아래에 있는 파일을 entry라고 하자
+  + src/client/js/main.js 생성
+* output
+  + 어디에 결과물이 나올지
 
 ```
 const path = require("path");
@@ -1843,12 +1818,12 @@ npm run assets
 실행하고 나면 assets/js/main.js에 우리가 작성한 코드가 압축되어 있는 것을 확인할 수 있다.
 
 ### Rules
-rules는 우리가 각각의 파일 종류에 따라 어떤 전환을 할 건지 결정하는 것
-그 파일 종류에 따라 적합한 loader를 찾아 설정하면 된다
+rules는 우리가 각각의 파일 종류에 따라 어떤 전환을 할 건지 결정하는 것   
+그 파일 종류에 따라 적합한 loader를 찾아 설정하면 된다   
 우리는 babel-loader가 필요함
 
 #### babel-loader
-https://www.npmjs.com/package/babel-loader
+<https://www.npmjs.com/package/babel-loader>
 ```
 npm i -D babel-loader @babel/core @babel/preset-env webpack
 ```
@@ -1902,13 +1877,13 @@ script(src="/assets/js/main.js")
 Sassy CSS
 
 ### scss 폴더 및 파일 생성
-create src/client/scss/_variables.scss styles.scss
+create src/client/scss/_variables.scss styles.scss   
 내용을 채우고 main.js에서 styles.scss를 import 한다.
 ```
 import "../scss/styles.scss";
 ```
 ### loader 설치
-그리고 loader(파일을 변환하는 장치)를 적용시켜줘야 한다
+그리고 loader(파일을 변환하는 장치)를 적용시켜줘야 한다   
 3가지 loader가 필요해
 * scss -> 일반 css => sass-loader
 ```
@@ -1924,8 +1899,8 @@ npm i -D style-loader
 ```
 
 ### loader 설정
-이 세 가지 loader를 하나로 합치자
-webpack은 뒤에서부터 시작하기 때문에 역순으로 입력해야 한다.
+이 세 가지 loader를 하나로 합치자   
+webpack은 뒤에서부터 시작하기 때문에 *역순*으로 입력해야 한다.
 ```
 {
   test: /\.scss$/,
@@ -1934,13 +1909,13 @@ webpack은 뒤에서부터 시작하기 때문에 역순으로 입력해야 한�
 ```
 
 ## #9.5 MiniCssExtractPlugin
-https://www.npmjs.com/package/mini-css-extract-plugin
+<https://www.npmjs.com/package/mini-css-extract-plugin>   
 그런데 우리는 css가 js에 합쳐진 상태로 하고 싶은 게 아니고 js와 css를 분리하고 싶은 거니까 코드를 다시 고치자.
 ### 설치
 ```
 npm i -D mini-css-extract-plugin
 ```
-이제 style-loader를 쓰지 않고 대신 mini-css-extract-plugin 쓴다.
+이제 style-loader를 쓰지 않고 대신 *mini-css-extract-plugin* 쓴다.
 ```
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
@@ -1989,18 +1964,18 @@ html(lang="ko")
     link(rel="stylesheet" href="https://unpkg.com/mvp.css")
     link(rel="stylesheet" href="/assets/css/styles.css")
 ```
-명심할 것!
-client 파일은 webpack에 의해서만 로딩하게 할 거고
-assets(static) 파일은 pug에서 로딩된다. 즉 사용자와 template은 만들어진 부분만 보게 된다.
+* 명심할 것!
+  + client 파일은 webpack에 의해서만 로딩하게 할 거고
+  + assets(static) 파일은 pug에서 로딩된다. 즉 사용자와 template은 만들어진 부분만 보게 된다.
 
 ## #9.6 Better developer experience
 ### frontend도 수정되면 자동으로 npm 실행되게 하기
-config에 watch를 추가하면 front-end webpack이 계속 살아있게 된다.
+config에 *watch*를 추가하면 front-end webpack이 계속 살아있게 된다.
 ```
 watch: true,
 ```
 
-output folder를 클린해주는 설정을 추가한다.
+output folder를 *클린*해주는 설정을 추가한다.   
 근데 이거는 완벽히 webpack을 재시작했을 때만 적용된다.
 ```
 output: {
@@ -2011,10 +1986,10 @@ output: {
 ```
 
 ### nodemon.json 생성
-front-end가 수정되는데 nodeJS도 자꾸 재실행된다.
+front-end가 수정되는데 nodeJS도 자꾸 재실행된다.   
 그래서 nodemon 설정을 바꿀거야
 
-Before
+* Before
 ```
 "scripts": {
   "dev": "nodemon --exec babel-node src/init.js",
@@ -2022,15 +1997,15 @@ Before
 },
 ```
 
-After
-nodemon.json을 생성 후 설정 내용을 넣는다.
+* After
+  + nodemon.json을 생성 후 설정 내용을 넣는다.
 ```
 {
   "ignore": ["webpack.config.js", "src/client/*", "assets/*"],
   "exec": "babel-node src/init.js"
 }
 ```
-그리고 package.json은 아래처럼 수정한다.
+  + 그리고 package.json은 아래처럼 수정한다.
 ```
 "scripts": {
   "dev": "nodemon",
@@ -2039,9 +2014,9 @@ nodemon.json을 생성 후 설정 내용을 넣는다.
 ```
 
 ### 최종 package.json 수정
-nodemon은 자동으로 nodemon.json을 부르고
-webpack은 자동으로 webpack.config.js를 부르기 때문에
-굳이 --config 설정 넣어주지 않아도 된다.
+nodemon은 자동으로 nodemon.json을 부르고   
+webpack은 자동으로 webpack.config.js를 부르기 때문에   
+굳이 --config 설정 넣어주지 않아도 된다.   
 그리고 dev, assets 에서 dev:server와 dev:assets으로 좀더 명시적으로 이름을 수정함
 ```
 "scripts": {
@@ -2055,29 +2030,27 @@ webpack은 자동으로 webpack.config.js를 부르기 때문에
 scss와 html 작업을 할 예정
 
 ### Basic structure
-1) 우리는 pug 기반의 views를 만들었고 MVP css를 사용하고 있다.
-MVP css를 지울 거야. (base.pug에서)
+1. 우리는 pug 기반의 views를 만들었고 MVP css를 사용하고 있다.
+  + MVP css를 지울 거야. (base.pug에서)
 
-2) font-awesome 설치
-https://cdnjs.com/libraries/font-awesome로 이동해서 고른다음에 base.pug에 적용
+2. font-awesome 설치
+  + <https://cdnjs.com/libraries/font-awesome>로 이동해서 고른다음에 base.pug에 적용
 ```
 link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
 ```
-pug에서 아래처럼 쓰면 유투브 로고가 나온다
+  + pug에서 아래처럼 쓰면 유투브 로고가 나온다
 ```
 i.fab.fa-youtube
 ```
 
-3) client/scss 아래에 components와 screens 생성
-components: partials(headers, footers, ...)나 mixins을 만들면 여기에 scss를
-screens: view template(home, search, ...)를 만들면 여기에 scss를
+3. client/scss 아래에 components와 screens 생성
+  + components: partials(headers, footers, ...)나 mixins을 만들면 여기에 scss를
+  + screens: view template(home, search, ...)를 만들면 여기에 scss를
+  + 그리고 _variables.scss를 config 아래로 옮김
+  + _reset.scss를 만들고 https://meyerweb.com/eric/tools/css/reset 에서 내용을 가져옴
+    + 모든 설정을 0으로 바꿔주는 애야 (no padding, no margin, ...)
 
-그리고 _variables.scss를 config 아래로 옮김
-
-_reset.scss를 만들고 https://meyerweb.com/eric/tools/css/reset 에서 내용을 가져옴
-모든 설정을 0으로 바꿔주는 애야 (no padding, no margin, ...)
-
-4) base.pug에서 header를 분리하고 partials/header와 footer와 이름이 똑같은 scss를 components 아래에 생성한다.
+4. base.pug에서 header를 분리하고 partials/header와 footer와 이름이 똑같은 scss를 components 아래에 생성한다.
 
 ## #10.3 Styles Conclusions
 
@@ -2091,17 +2064,17 @@ const user = await User.findById(id).populate({
   }
 });
 ```
-userController의 see를 보면 위에처럼 double populate를 사용한 부분이 있다.
-원래는 populate("videos")로 되어있었어
-그러면 그 유저의 비디오만 가져오게 돼
-근데 그러면 그 비디오에 대한 owner가 없어
+* userController의 see를 보면 위에처럼 *double populate*를 사용한 부분이 있다.
+  + 원래는 populate("videos")로 되어있었어
+  + 그러면 그 유저의 비디오만 가져오게 돼
+  + 근데 그러면 그 비디오에 대한 owner가 없어
 
-path는 우리가 먼저 populate 하고 싶은 거야
-  우리는 제일 먼저 user의 videos가 populate 하고 싶어
-두번째는 owner야
-  왜냐면 video에는 owner가 있고 그리고 모델이 무엇인지 명시할 수 있다
+* path는 우리가 먼저 populate 하고 싶은 거야
+  + 우리는 제일 먼저 user의 videos가 populate 하고 싶어
+* 두번째는 owner야
+  + 왜냐면 video에는 owner가 있고 그리고 모델이 무엇인지 명시할 수 있다
 
-즉 유저를 DB에서 받고 -> 그 유저가 업로드한 비디오를 받고 -> 그리고 그 비디오의 owner를 받는다
+* 즉 유저를 DB에서 받고 -> 그 유저가 업로드한 비디오를 받고 -> 그리고 그 비디오의 owner를 받는다
 
 # #11 VIDEO PLAYER
 ## #11.0 Player Setup
@@ -2109,16 +2082,17 @@ path는 우리가 먼저 populate 하고 싶은 거야
 ```
 entry: "./src/client/js/main.js",
 ```
-JS를 컴파일 하면서 실행한다 (얘는 base.pug에 로드되어 있다)
+* JS를 컴파일 하면서 실행한다 (얘는 base.pug에 로드되어 있다)
 
-그런데 비디오 녹화 코드를 홈페이지에 로드하는게 현명하다고 생각해? Nope
-그래서 우리는 다른 JS를 마들어서 그 JS를 다른 페이지에 포함시킬거야
+* 그런데 비디오 녹화 코드를 홈페이지에 로드하는게 현명하다고 생각해?
+  + Nope
+  + 그래서 우리는 다른 JS를 마들어서 그 JS를 다른 페이지에 포함시킬거야
 
-홈페이지에서는 어떤 JS도 로드하지 않을거야
-비디오페이지에 가면 그 때 비디오 플레이어 코드를 로드할 거야
+* 홈페이지에서는 어떤 JS도 로드하지 않을거야
+  + 비디오페이지에 가면 그 때 비디오 플레이어 코드를 로드할 거야
 
-지금 우리의 webpack은 하나의 entry (main)만 가지고 있어
-client/js에 videoPlayer.js 생성
+* 지금 우리의 webpack은 하나의 entry (main)만 가지고 있어
+  + client/js에 videoPlayer.js 생성
 
 ### entry 추가
 ```
@@ -2127,7 +2101,7 @@ entry: {
   videoPlayer: "./src/client/js/videoPlayer.js",
 },
 ```
-entry를 obj로 변경하고 위에 처럼 새로 추가한다.
+entry를 obj로 변경하고 위에 처럼 새로 추가한다.   
 단 output에 js/main.js로 저장하고 있으므로 file의 이름에 따라 저장될 수 있도록 아래처럼 수정한다.
 ```
 output: {
@@ -2138,20 +2112,20 @@ output: {
 ```
 
 ### videoPlayer.js를 비디오 플레이어가 필요한 페이지에 로드하기
-그건 바로 watch.pug
-그런데 watch는 extend base를 하고 있어서 script를 넣을 곳이 없기 때문에 base부터 수정할게
+* 그건 바로 watch.pug
+  + 그런데 watch는 extend base를 하고 있어서 script를 넣을 곳이 없기 때문에 base부터 수정할게
 
-Before base.pug
+* Before base.pug
 ```
 script(src="/assets/js/main.js")
 ```
 
-After base.pug
+* After base.pug
 ```
 block scripts
 ```
 
-그리고 watch.pug에서 scripts block 아래에 script를 넣어준다.
+* 그리고 watch.pug에서 scripts block 아래에 script를 넣어준다.
 ```
 block scripts
   script(src="/assets/js/videoPlayer.js")
@@ -2175,10 +2149,10 @@ div
 ```
 
 ### videoPlayer.js 설정
-video element와 audio element는 둘다 html media element로부터 상속받는다.
-https://developer.mozilla.org/ko/docs/Web/API/HTMLMediaElement
+* video element와 audio element는 둘다 html media element로부터 상속받는다.   
+  + <https://developer.mozilla.org/ko/docs/Web/API/HTMLMediaElement>
 
-element 설정
+* element 설정
 ```
 const video = document.querySelector("video");
 const playBtn = document.getElementById("play");
@@ -2187,7 +2161,7 @@ const time = document.getElementById("time");
 const volume = document.getElementById("volume");
 ```
 
-play/pause event와 innertext eventß
+* play/pause event와 innertext event
 ```
 // handle play pause
 playBtn.addEventListener("click", (event) => {
