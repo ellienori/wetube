@@ -2102,3 +2102,57 @@ path는 우리가 먼저 populate 하고 싶은 거야
   왜냐면 video에는 owner가 있고 그리고 모델이 무엇인지 명시할 수 있다
 
 즉 유저를 DB에서 받고 -> 그 유저가 업로드한 비디오를 받고 -> 그리고 그 비디오의 owner를 받는다
+
+# #11 VIDEO PLAYER
+## #11.0 Player Setup
+### webpack 설정 확인
+```
+entry: "./src/client/js/main.js",
+```
+JS를 컴파일 하면서 실행한다 (얘는 base.pug에 로드되어 있다)
+
+그런데 비디오 녹화 코드를 홈페이지에 로드하는게 현명하다고 생각해? Nope
+그래서 우리는 다른 JS를 마들어서 그 JS를 다른 페이지에 포함시킬거야
+
+홈페이지에서는 어떤 JS도 로드하지 않을거야
+비디오페이지에 가면 그 때 비디오 플레이어 코드를 로드할 거야
+
+지금 우리의 webpack은 하나의 entry (main)만 가지고 있어
+client/js에 videoPlayer.js 생성
+
+### entry 추가
+```
+entry: {
+  main: "./src/client/js/main.js",
+  videoPlayer: "./src/client/js/videoPlayer.js",
+},
+```
+entry를 obj로 변경하고 위에 처럼 새로 추가한다.
+단 output에 js/main.js로 저장하고 있으므로 file의 이름에 따라 저장될 수 있도록 아래처럼 수정한다.
+```
+output: {
+  filename: "js/[name].js",
+  path: path.resolve(__dirname, "assets"),
+  clean: true,
+},
+```
+
+### videoPlayer.js를 비디오 플레이어가 필요한 페이지에 로드하기
+그건 바로 watch.pug
+그런데 watch는 extend base를 하고 있어서 script를 넣을 곳이 없기 때문에 base부터 수정할게
+
+Before base.pug
+```
+script(src="/assets/js/main.js")
+```
+
+After base.pug
+```
+block scripts
+```
+
+그리고 watch.pug에서 scripts block 아래에 script를 넣어준다.
+```
+block scripts
+  script(src="/assets/js/videoPlayer.js")
+```
