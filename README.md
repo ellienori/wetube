@@ -2070,7 +2070,7 @@ i.fab.fa-youtube
 
 3) client/scss 아래에 components와 screens 생성
 components: partials(headers, footers, ...)나 mixins을 만들면 여기에 scss를
-screens: view template(home, search, ...)를 만들면 여기에 
+screens: view template(home, search, ...)를 만들면 여기에 scss를
 
 그리고 _variables.scss를 config 아래로 옮김
 
@@ -2078,3 +2078,27 @@ _reset.scss를 만들고 https://meyerweb.com/eric/tools/css/reset 에서 내용
 모든 설정을 0으로 바꿔주는 애야 (no padding, no margin, ...)
 
 4) base.pug에서 header를 분리하고 partials/header와 footer와 이름이 똑같은 scss를 components 아래에 생성한다.
+
+## #10.3 Styles Conclusions
+
+### Double populate
+```
+const user = await User.findById(id).populate({
+  path: "videos",
+  populate: {
+    path: "owner",
+    model: "User",
+  }
+});
+```
+userController의 see를 보면 위에처럼 double populate를 사용한 부분이 있다.
+원래는 populate("videos")로 되어있었어
+그러면 그 유저의 비디오만 가져오게 돼
+근데 그러면 그 비디오에 대한 owner가 없어
+
+path는 우리가 먼저 populate 하고 싶은 거야
+  우리는 제일 먼저 user의 videos가 populate 하고 싶어
+두번째는 owner야
+  왜냐면 video에는 owner가 있고 그리고 모델이 무엇인지 명시할 수 있다
+
+즉 유저를 DB에서 받고 -> 그 유저가 업로드한 비디오를 받고 -> 그리고 그 비디오의 owner를 받는다
