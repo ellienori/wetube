@@ -2156,3 +2156,55 @@ block scripts
 block scripts
   script(src="/assets/js/videoPlayer.js")
 ```
+
+## #11.1 Play Pause
+우리가 video player 관련으로 손 볼 뷰는 watch.pug이고 js는 client/js/videoPlayer.js 이다.
+### scss에서 특정 type만 style 설정 제외하기
+range input을 수정하기 위해 forms.scss에 아래처럼 range는 제외시켰다.
+```
+input:not([type="range"]) {
+```
+### video player view 설정
+js에서 설정을 변경하기 위해 '#'으로 id를 추가했다.
+```
+div 
+  button#play Play 
+  button#mute Mute 
+  span#time 00:00/00:00
+  input(type="range", step="0.1", min="0", max="1")#volume
+```
+
+### videoPlayer.js 설정
+video element와 audio element는 둘다 html media element로부터 상속받는다.
+https://developer.mozilla.org/ko/docs/Web/API/HTMLMediaElement
+
+element 설정
+```
+const video = document.querySelector("video");
+const playBtn = document.getElementById("play");
+const muteBtn = document.getElementById("mute");
+const time = document.getElementById("time");
+const volume = document.getElementById("volume");
+```
+
+play/pause event와 innertext eventß
+```
+// handle play pause
+playBtn.addEventListener("click", (event) => {
+  // if the video is playing, pause it
+  if (video.paused) {
+    video.play();
+  } else {
+    // else play the video
+    video.pause();
+  }
+});
+
+// Change Innertext
+video.addEventListener("pause", (event) => {
+  playBtn.innerText="Play";
+});
+video.addEventListener("play", (event) => {
+  playBtn.innerText="Pause";
+});
+```
