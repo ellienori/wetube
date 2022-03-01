@@ -2198,3 +2198,57 @@ volumeRange.addEventListener("input", (event) => {
   console.log(event.target.value);
 });
 ```
+
+## #11.4 Duration and Current Time
+
+### Duration
+* 사용할 event: *loadedmetadata*
+  + <https://developer.mozilla.org/ko/docs/Web/API/HTMLMediaElement>
+  + fired when the metadata has been loaded
+  + meta data는 video를 제외한 모든 데이터
+    + e.g. width, height, ...
+
+* template 추가로 controller에도 element 추가
+```
+// template
+div
+  span#currentTime 0:00
+  span  / 
+  span#totalTime 0:00
+
+// controller
+const currentTime = document.getElementById("currentTime");
+const totalTime = document.getElementById("totalTime");
+```
+
+* event handler
+```
+video.addEventListener("loadedmetadata", (event) => {
+  totalTime.innerText = Math.floor(video.duration);
+});
+```
+
+* Bug: Event listner를 추가하기 전에 video가 전부 로딩되서 loadedMetadata가 아예 불러지지 않은 경우에 total time이 출력되지 않음
+  + *readyState == 4* 라는 것은 비디오가 로딩 되었다는 뜻
+```
+// handle totalTime
+const handleLoadedMetadata = () => {
+  totalTime.innerText = Math.floor(video.duration);
+}
+video.addEventListener("loadedmetadata", handleLoadedMetadata);
+
+if (video.readyState == 4) {
+  handleLoadedMetadata();
+}
+```
+
+### Current Time
+* 사용할 event: *timeupdate*
+  + <https://developer.mozilla.org/ko/docs/Web/API/HTMLMediaElement>
+  + current time이 업데이트될 때마다 cureentTime라는 value를 가져옴
+```
+// handle currentTime
+video.addEventListener("timeupdate", (event) => {
+  currentTime.innerText = Math.floor(video.currentTime);
+});
+```
