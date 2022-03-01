@@ -2188,3 +2188,13 @@ video.addEventListener("play", (event) => {
 ```
 video.muted
 ```
+
+## #11.3 Volume
+* volumeRange는 *change*와 *input*이라는 이벤트를 감지한다.
+  + change: 마우스 커서를 놓을 때 값을 받아옴
+  + input: 실시간으로 커서를 이동할 때 값을 받아옴
+```javascript
+volumeRange.addEventListener("input", (event) => {
+  console.log(event.target.value);
+});
+```
