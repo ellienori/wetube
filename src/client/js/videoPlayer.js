@@ -7,13 +7,38 @@ const totalTime = document.getElementById("totalTime");
 const timeline = document.getElementById("timeline");
 const fullScreenBtn = document.getElementById("fullScreen");
 const videoContainer = document.getElementById("videoContainer");
+const videoControls = document.getElementById("videoControls");
 
+let controlsPid = null;
+let controlsMovementPid = null;
 let volume = 0.5;
 video.volume = volume;
 
 const formatTime = (seconds) => {
   return new Date(seconds * 1000).toISOString().substring(14, 19);
 };
+
+// Controls Event
+const hidingControls = () => videoControls.classList.remove("showing");
+
+video.addEventListener("mousemove", () => {
+  if (controlsPid) {
+    clearTimeout(controlsPid);
+    controlsPid = null;
+  }
+  if(controlsMovementPid) {
+    clearTimeout(controlsMovementPid);
+    controlsMovementPid = null;
+  }
+  videoControls.classList.add("showing");
+  controlsMovementPid = setTimeout(hidingControls, 3000);
+});
+
+video.addEventListener("mouseleave", () => {
+  controlsPid = setTimeout(hidingControls, 3000);
+});
+
+/// Controls Implementation
 
 // handle play pause
 playBtn.addEventListener("click", (event) => {
