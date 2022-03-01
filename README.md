@@ -2252,3 +2252,15 @@ video.addEventListener("timeupdate", (event) => {
   currentTime.innerText = Math.floor(video.currentTime);
 });
 ```
+
+## #11.5 Time Formatting
+* new Date(우리값*1000).toISOString().subString(11, 19);
+  + milleseconds기 때문에 우리가 가진 초 값 * 1000 하면 우리가 아는 시간으로 계산
+  + .toISOString()으로 가져오면 앞에 1970-01-01도 같이 오니까 스트링을 잘라내자
+  + .subString(시작index, 종료index)를 쓰자. 참고로 index는 0부터 시작
+```
+const formatTime = (seconds) => {
+  return new Date(seconds * 1000).toISOString().substring(14, 19);
+};
+```
+
