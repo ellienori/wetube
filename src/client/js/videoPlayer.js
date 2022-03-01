@@ -41,10 +41,8 @@ videoContainer.addEventListener("mouseleave", () => {
   controlsPid = setTimeout(hidingControls, 3000);
 });
 
-/// Controls Implementation
-
 // handle play pause
-playBtn.addEventListener("click", (event) => {
+const handleVideoPlayPause = () => {
   // if the video is playing, pause it
   if (video.paused) {
     video.play();
@@ -52,9 +50,16 @@ playBtn.addEventListener("click", (event) => {
     // else play the video
     video.pause();
   }
-
   playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause";
-});
+};
+
+playBtn.addEventListener("click", handleVideoPlayPause);
+video.addEventListener("click", handleVideoPlayPause);
+document.addEventListener("keypress", (event) => {
+  if (event.code === "Space") {
+    handleVideoPlayPause();
+  }
+})
 
 // handle mute
 muteBtn.addEventListener("click", (event) => {
@@ -113,14 +118,20 @@ videoContainer.addEventListener("fullscreenchange", () => {
 
 // handle currentTime
 video.addEventListener("timeupdate", () => {
-  currentTime.innerText = formatTime(Math.floor(video.currentTime));
-  timeline.value = Math.floor(video.currentTime);
+  const time = Math.floor(video.currentTime);
+  if (time) {
+    currentTime.innerText = formatTime(time);
+  }
+  timeline.value = time;
 });
 
 // handle totalTime
 const handleLoadedMetadata = () => {
-  totalTime.innerText = formatTime(Math.floor(video.duration));
-  timeline.max = Math.floor(video.duration);
+  const time = Math.floor(video.duration);
+  if (time) {
+    totalTime.innerText = formatTime(time);
+  }
+  timeline.max = time;
 }
 video.addEventListener("loadeddata", handleLoadedMetadata);
 

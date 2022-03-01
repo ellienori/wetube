@@ -2423,3 +2423,19 @@ video.addEventListener("mouseleave", () => {
   controlsTimeoutPid = setTimeout(hidingControls, 3000);
 });
 ```
+
+## #11.11 Recap
+### 구현해야 할 것
+* video를 클릭해도 동영상 play / pause
+```
+video.addEventListener("click", handleVideoPlayPause);
+```
+* 스페이스 bar 눌러도 동영상 play / pause
+```
+document.addEventListener("keypress", (event) => {
+  if (event.code === "Space") {
+    handleVideoPlayPause();
+  }
+})
+```
+* 컨트롤바 위에 있으면 컨트롤바 사라져 비디오 위에 있는 게 아니라서 -> mouseevent를 video가 아니라 videocontrol로 바꾸기
