@@ -2439,3 +2439,78 @@ document.addEventListener("keypress", (event) => {
 })
 ```
 * 컨트롤바 위에 있으면 컨트롤바 사라져 비디오 위에 있는 게 아니라서 -> mouseevent를 video가 아니라 videocontrol로 바꾸기
+
+# #12 VIEWS API
+## #12.0~ Register View Controller
+### 설명
+* 영상 조회수를 기록하는 기능을 구현할거야
+  + 사용자가 영샹을 다 보면 db에서 view가 1개 증가해야함
+* *API view*: template을 rendering 하지 않는 view
+  + 오로지 목적은 백엔드에 정보를 전송하고 처리
+    + frontend에서 JS를 호출하는 URL 인거야
+  + 요청을 보내더라도 url을 바꾸거나 template을 랜더링하지 않음
+  + form을 사용하지 않고 post 구현 하자
+  + 어디서나 접근할 수 있다
+### 구조 구축
+* apiRouter.js 생성
+  + videos의 id를 가져온다
+```
+import express from "express";
+import { registerView } from "../controllers/videoController";
+
+const apiRouter = express.Router();
+
+apiRouter.post("/videos/:id([0-9a-f]{24})/view", registerView);
+export default apiRouter;
+```
+* server.js에 router 등록: ```app.use("/api", apiRouter);```
+* videoController에 view 관련 controller 생성
+  + 얘는 template을 랜더링하지 않기 때문에 status만 리턴한다.
+  + 어떤 걸 render/redirect를 하지 않을 경우에는 *sendStatus()*를 써야한다.
+    + 404: 해당 비디오가 없을 때
+    + 200: 정상일 때
+```
+export const registerView = async (req, res) => {
+  // get video using id
+  const { id } = req.params;
+  const video = await Video.findById(id);
+  if(!video) {
+    return res.sendStatus(404);
+  } 
+  video.meta.views += 1;
+  await video.save();
+  return res.sendStatus(200); // OK
+};
+```
+
+### URL 호출
+* 이 URL은 frontend에서 호출해야해
+  + 보통은
+    + 해당 url로 페이지 이동하면 백엔드의 controller가 실행
+  + 여기서는 페이지 이동 없이 url을 호출하는 방법을 배울거야 => *interactivity*
+* Interactivity는 URL이 바뀌지 않아도 페이지에서 변화가 생기는 것을 의미
+  + e.g. 강의에 댓글을 달면 url이 바뀌지 않음
+  + 우리가 pug 쓰는 건 interactivity 하지 않아
+
+* 유저가 비디오 시청을 끝냈을 때 생기는 이벤트를 처리하자
+  + videoPlayer.js
+    + 그냥 fetch()쓰면 get 요청이기 때문에 post로 바꿔야해
+```
+// when user finishes watching video,
+video.addEventListener("ended", () => {
+  // request to backend
+  const { id } = videoContainer.dataset;
+  fetch(`/api/videos/${id}/view`, {
+    method: "POST",
+  });
+});
+```
+  + fetch 하려면 비디오 id를 알아야하는데 그 아이디는 이 템플릿을 랜더링하는 pug에게 정보를 넘기라고 하자
+    + 가장 좋은 방법은 우리가 직접 데이터를 만들어서 HTML에 저장하는 것 - *data attribute*
+
+### Data attribute
+* data-로 시작하는 attribute를 의미
+  + e.g. data-columns, data-index-number, ...
+```
+div#videoContainer(data-id=video._id)
+```

@@ -21,6 +21,15 @@ const formatTime = (seconds) => {
   return new Date(seconds * 1000).toISOString().substring(14, 19);
 };
 
+// when user finishes watching video,
+video.addEventListener("ended", () => {
+  // request to backend
+  const { id } = videoContainer.dataset;
+  fetch(`/api/videos/${id}/view`, {
+    method: "POST",
+  });
+});
+
 // Controls Event
 const hidingControls = () => videoControls.classList.remove("showing");
 
