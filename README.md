@@ -1,5 +1,5 @@
 # This is a study notion.
-
+* <https://gist.github.com/ihoneymon/652be052a0727ad59601>
 # Set up
 
 ## package.json
@@ -2181,4 +2181,10 @@ video.addEventListener("pause", (event) => {
 video.addEventListener("play", (event) => {
   playBtn.innerText="Pause";
 });
+```
+
+## #11.2 Mute and Unmute
+* play와 다르게 property로 존재함 (T/F)
+```
+video.muted
 ```
