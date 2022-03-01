@@ -2264,3 +2264,43 @@ const formatTime = (seconds) => {
 };
 ```
 
+## #11.6 Timeline
+* 우리 비디오 시간을 업데이트 해주는 기능
+  + 재생바를 움직일 때 아래 표시되는 current Time이 바뀌게
+
+* template 수정 + element 및 변수 추가
+  + template에서 timeline ranage를 생성할 때 max를 정해주지 않고
+  + loadedMetadata에서 video.duration을 max 값으로 가져오자
+```
+// template
+div 
+  input(type="range", step="1", value=0, min="0")#timeline
+
+// controllers
+const timeline = document.getElementById("timeline");
+
+const handleLoadedMetadata = () => {
+  totalTime.innerText = formatTime(Math.floor(video.duration));
+  timeline.max = Math.floor(video.duration);
+}
+```
+
+* controller 수정
+1. 비디오 시간에 따라 timeline range가 변경되도록 하기
+  + timeupdate는 비디오 시간이 변경되는 걸 감지하는 event이기 때문에 그대로 사용하자
+```
+video.addEventListener("timeupdate", (event) => {
+  currentTime.innerText = formatTime(Math.floor(video.currentTime));
+  timeline.value = Math.floor(video.currentTime);
+});
+```
+2. timeline range를 변경하면 비디오 시간이 변경되게 하기
+// handle timeline
+timeline.addEventListener("input", (event) => {
+  const {
+    target: {
+      value,
+    }
+  } = event;
+  video.currentTime = value;
+})
