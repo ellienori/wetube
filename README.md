@@ -2304,3 +2304,40 @@ timeline.addEventListener("input", (event) => {
   } = event;
   video.currentTime = value;
 })
+
+## #11.7 Fullscreen
+* 위의 다른 속성들처럼 #fullScreen이라는 버튼을 추가한 후 event handler에서 *requestFullscreen* 사용
+```
+// handle fullscreen button
+fullScreenBtn.addEventListener("click", () => {
+  video.requestFullscreen();
+});
+```
+
+* 그런데 비디오만 확대하는 게 아니라 전체 요소를 다 확대하고 싶다
+  + template에 ```div#videoContainer``` 추가
+  + 똑같이 ```videoContainer.requestFullscreen()``` 사용 가능
+
+* Enter Full Screen <-> Exit Full Screen 버튼 내용 변경
+  + ```document.fullscreenElement```는 현재 fullscreen이면 해당 element를 출력함 ( e.g. div)
+  + ```document.exitFullscreen()```는 fullscreen을 벗어나게 한다.
+```
+// handle fullscreen button
+fullScreenBtn.addEventListener("click", () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+    fullScreen.innerText = "Enter Full Screen";
+  } else {
+    videoContainer.requestFullscreen();
+    fullScreen.innerText = "Exit Full Screen";
+  }
+});
+```
+  + esc 키로 창을 벗어났을 때도 버튼명을 변경하고 싶어 *fullscreenchange*라는 이벤트 사용
+```
+videoContainer.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement) {
+    fullScreen.innerText = "Enter Full Screen";
+  }
+});
+```
