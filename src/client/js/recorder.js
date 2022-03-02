@@ -1,15 +1,15 @@
 const recordBtn = document.getElementById("recordBtn");
-const preview = document.getElementById("preview");
+const video = document.getElementById("preview");
 
-let stream, recorder;
+let stream, recorder, videoFile;
 
 const init = async () => {
   stream = await navigator.mediaDevices.getUserMedia({
     audio: false, 
     video: { width: 200, height: 100, },
   });
-  preview.srcObject = stream;
-  preview.play();
+  video.srcObject = stream;
+  video.play();
 };
 
 const handleRecordStart = () => {
@@ -19,17 +19,27 @@ const handleRecordStart = () => {
 
   recorder = new MediaRecorder(stream);
   recorder.ondataavailable = (event) => {
-    const video = URL.createObjectURL(event.data); 
-    preview.srcObject = null;
-    preview.src = video;
-    preview.loop = true;
+    videoFile = URL.createObjectURL(event.data); 
+    video.srcObject = null;
+    video.src = videoFile;
+    video.loop = true;
     preview.play();
   }
   recorder.start();
 };
 
 const handleRecordDownload = () => {
+  recordBtn.innerText = "Start Recording";
+  recordBtn.removeEventListener("click", handleRecordDownload);
+  recordBtn.addEventListener("click", handleRecordStart);
 
+  const a = document.createElement("a");
+  a.href = videoFile;
+  a.download = "MyRecording.webm";
+  document.body.appendChild(a);
+  a.click();
+
+  init();
 };
 
 const handleRecordStop = () => {

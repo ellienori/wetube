@@ -2602,3 +2602,23 @@ const handleRecordStart = () => {
 };
 ```
 
+## #13.4 Downloading the File
+* Fake link
+  + a 태그 생성해서 비디오 링크를 걸고 body에 append한다,
+```javascript
+const a = document.createElement("a");
+a.href = videoFile;
+a.download = "MyRecording.webm";
+document.body.appendChild(a);
+a.click();
+```
+output
+```
+<a href="blob:http://localhost:4000/d8b8e836-6d20-4dfe-a773-35099471c6ea" download="MyRecording"></a>
+```
+
+* 만약 mp4로 하고 싶으면 아래처럼 recoder 생성할 때 타입 지정하면 된다.
+  + 우리 브라우저에서는 안된다.
+```
+recorder = new MediaRecorder(stream, {mimeType: "video/mp4"});
+```
