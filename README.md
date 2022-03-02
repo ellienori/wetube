@@ -2514,3 +2514,91 @@ video.addEventListener("ended", () => {
 ```
 div#videoContainer(data-id=video._id)
 ```
+
+# #13 VIDEO RECORDER
+## #13.0~ Recorder
+### 뼈대 구축
+* javascript 만들기 - recorder.js
+  + webpack에 의해 처리되어야 하니까 webpac.config.js에 entry 추가하기
+    + 그리고나서 webpack 재실행하면 assets/js/recorder.js 생성
+
+* upload에 script 추가
+```pug
+block scripts
+  script(src="/assets/js/recorder.js")
+```
+
+### stream 추가
+* template
+```pug
+div
+  button#recordBtn Start Recording
+```
+
+* javascript
+  + *navigator.mediaDevices.getUserMedia({audio: true, video: true})*로 사용자의 오디오, 비디오 stream 가져올거야
+  ```javascript
+  recordBtn.addEventListener("click", async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true, 
+      video: true,
+    });
+    console.log(stream);
+  });
+  ```
+
+* 에러 주의
+>recorder.js:6 Uncaught ReferenceError: regeneratorRuntime is not defined
+  + frontend에서 async await를 쓰려면 regeneratorRuntime을 설치해야해 -> 아니면 그냥 promise로 쓰던가
+  + ```npm i regenerator-runtime```
+    + main.js에 ```import regeneratorRuntime from "regenerator-runtime";```
+    + base.pug에 main.js를 import (위치 주의할 것)
+
+### stream 보여주기
+* *srcObject*는 video가 가질 수 있는 무언가를 의미
+```javascript
+  video.srcObject = stream;
+  video.play();
+```
+
+### 녹화하기
+* eventlistner에 여러개의 함수 쓰기
+```javascript
+const handleRecordStart = () => {
+  recordBtn.innerText = "Stop Recording";
+  recordBtn.removeEventListener("click", handleRecordStart);
+  recordBtn.addEventListener("click", handleRecordStop);
+}
+const handleRecordStop = () => {
+  recordBtn.innerText = "Start Recording";
+  recordBtn.removeEventListener("click", handleRecordStop);
+  recordBtn.addEventListener("click", handleRecordStart);
+}
+recordBtn.addEventListener("click", handleRecordStart);
+```
+
+* *MediaRecorder*를 사용해서 녹화 할 예정
+  + 기존에 Record 버튼 클릭하면 preview를 보여줬는데 이제 창이 뜨면 바로 preview를 보여주고 클릭하면 녹화하게 코드 수정
+  + *ondataavailable* event 사용
+  + *URL.createObjectURL()*는 브라우저 메모리에서만 사용할 수 있는 URL을 만들어준다.
+    + 브라우저 메모리에 녹화 파일을 저장하고 브라우저가 그 파일에 접근할 수 있는 URL을 줌
+    + <video id="preview" src="blob:http://localhost:4000/6e15e3ef-93a1-41f0-9e7e-136ef2426b5a"></video>
+    + 꼭 우리 웹사이트에서 호스팅되는 것처럼 보여도 실제론 X
+```
+const handleRecordStart = () => {
+  recordBtn.innerText = "Stop Recording";
+  recordBtn.removeEventListener("click", handleRecordStart);
+  recordBtn.addEventListener("click", handleRecordStop);
+
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = (event) => {
+    const video = URL.createObjectURL(event.data); 
+    preview.srcObject = null;
+    preview.src = video;
+    preview.loop = true;
+    preview.play();
+  }
+  recorder.start();
+};
+```
+
