@@ -6,7 +6,7 @@
 
 ### scripts
 
-"win": "node index.js" 를 실행하기 위해서 npm run win 이라고 console에서 명령어 치면 됨
+*"win": "node index.js"* 를 실행하기 위해서 *npm run win*라고 console에서 명령어 치면 됨   
 babel 설치 후 "dev" "babel-node index.js"로 수정함. babel로 실행시키기 위해서
 
 ```
@@ -17,8 +17,10 @@ $ vim package.json
 
 ### dependencies
 
-dendencies 프로젝트를 실행하기 위한 것 (운전 시 가솔린 필요함, 운전 면허 필요함)
-devDendencies 개발자에게 필요한 것 (운전 시 음악 필요함ㅋ)
+* dendencies 프로젝트를 실행하기 위한 것
+  + 가솔린, 운전 면허
+* devDendencies 개발자에게 필요한 것
+  + 음악
 
 ## Express
 Node.js 웹 어플리케이션 프레임워크
@@ -34,17 +36,17 @@ NodeJS가 아직 이해하지 못하는 최신 JS 문법들을 전환해줌
 
 ### Installation
 
-참고: https://babeljs.io/setup
+참고: <https://babeljs.io/setup>
 
 ```
 $ npm i --save-dev @babel/core @babel/node
 $ npm i @babel/preset-env --save-dev
 ```
 
-devDependency를 위해 --save-dev로 설치하는 거임 (-D)
-만약 잘못 설치했으면 그냥 package.json에서 수정ㅇ하면 돼 그냥 text file 이잖아 ㄱㅊㄱㅊ
+* devDependency를 위해 *--save-dev*로 설치하는 거임 (-D)
+* 만약 잘못 설치했으면 그냥 package.json에서 수정ㅇ하면 돼 그냥 text file 이잖아 ㄱㅊㄱㅊ
 
-preset? babel plugin 종류 되게 다양함
+* preset? babel plugin 종류 되게 다양함
 
 ### Setting
 
@@ -60,10 +62,9 @@ $ vim package.json
 
 ## Nodemon
 
-파일이 수정되면 알아서 재시작을 해주는 얘야
-우리가 매번 npm run dev 할 필요 없어
-
-참고: https://www.npmjs.com/package/nodemon
+* 파일이 수정되면 알아서 재시작을 해주는 얘야
+  + 우리가 매번 *npm run dev* 할 필요 없어
+* 참고: https://www.npmjs.com/package/nodemon
 ### 설치
 ```
 $ npm install --save-dev nodemon
@@ -77,16 +78,15 @@ $ vim package.json
 # #2 Introduction to express
 ## GET Request (http request)
 
-Cannot GET /
-Browser: get '/' page.
-라는 뜻인데 root 페이지('/')를 지금 열 수 없다는 뜻
+>Cannot GET /
+*Browser: get '/' page.*라는 뜻인데 root 페이지('/')를 지금 열 수 없다는 뜻
 ```
 apt.get(routes, controller)
 ```
 ## Request / Response
 
-browser가 website(server)로 request를 보내고 server는 그에 대한 response를 줘야지
-response는 status code, html, .....
+* browser가 website(server)로 request를 보내고 server는 그에 대한 response를 줘야지
+  + response는 status code, html, .....
 
 ## Middleware
 
@@ -100,8 +100,9 @@ npm i morgan
 import morgan from "morgan";
 app.use(morgan("dev"));
 ```
-morgan을 쓰면 middleware가 더 정교하게 표현된다.
-종류는 총 5개 combined, common, dev, short, tiny
+* morgan을 쓰면 log가 더 정교하게 표현된다.
+* 종류는 총 5개
+  + combined, common, dev, short, tiny
 
 ```
 (Before)
@@ -167,10 +168,9 @@ videoRouter.get("/:id(\\d+)", see);
 # #5 TEMPLATE
 
 ## #5.0 ~ #5.1 PUG
-
-PUG: Html template helper
-우리의 express view engine으로 설정할거야
-우리가 pug file을 보내면 pug가 pug 파일을 평범한 html로 변환해서 사용자에게 제공함
+* PUG: Html template helper
+  + 우리의 express view engine으로 설정할거야
+  + 우리가 pug file을 보내면 pug가 pug 파일을 평범한 html로 변환해서 사용자에게 제공함
 
 ### Step 1. install
 
@@ -185,14 +185,12 @@ app.set("view engine", "pug");
 app.set("views", process.cwd()+"/src/views");
 ```
 
-서버의 cwd (curren working directory) 수정하기
+* 서버의 cwd (curren working directory) 수정하기
+  + 왜냐면 pug가 ```wetube/src/views/_.pug```에 있는데 자동으로 ```wetube/views/_.pug```를 찾고있기 때문
 
--> 왜냐면 pug가 wetube/src/views/_.pug에 있는데
-자동으로 wetube/views/_.pug를 찾고있기 때문
-
--> package.json이 실행되는 곳
-server.js에서 process.cwd() 찍어보면 정확하게 알 수 있음
-근데 package.json 어디있는 지 알잖아. wetube/package.json
+* cwd의 위치는 package.json이 실행되는 곳
+  + server.js에서 process.cwd() 찍어보면 정확하게 알 수 있음
+  + 근데 package.json 어디있는 지 알잖아. wetube/package.json
 
 ### Step 3. create a pug file
 
@@ -269,8 +267,8 @@ mixin video(info)
       li #{info.views} views.
 ```
 
-그리고 나서 위의 파일을 include해서 view 파일에서 써야지 (home.pug)
-include도 해야하고 + 표시해서 써야함
+* 그리고 나서 위의 파일을 include해서 view 파일에서 써야지 (home.pug)
+  + include도 해야하고 + 표시해서 써야함
 
 ```
 extends base.pug
@@ -304,50 +302,59 @@ watch.pug
 ```
 
 ## #6.2~6.3 Edit
-### POST, GET 이해하기
+### POST, GET 이해하기 (HTTP method)
 #### GET
-구글이나 네이버에 검색할 때 다음에 'search?검색어' 이런 식으로 url에 넘어가잖아
-그럴 때 GET을 쓰는 거임
-그리고 얘는 default라 따로 method 설정 안해주면 get으로 되어 있음
-
-wetube에서는 비디오 검색할 때 사용
+* *가져온다*
+  + 서버에서 어떤 데이터를 가져와서 보여줄 때. 어떤 값이나 내용, 상태 등을 바꾸지 않을 때
+    + idempotent: 연산을 여러 번 적용하더라도 결과가 달라지지 않음
+  + 클라이언트에서 서버로 어떠한 리소스로부터 *정보를 요청*하기 위해 사용되는 메서드
+    + 데이터를 *읽거나*(Read), *검색*(Retrieve)할 때에 사용되는 메서드
+    + 데이터 변형의 위험없이 사용할 수 있다 -> 안전하다
+  + 요청할 때 URL 주소 끝에 parameter로 포함되서 전송. 이 부분을 *쿼리 스트링*(Query String)이라 함
+    + 구글이나 네이버에 검색할 때 다음에 'search?검색어' 이런 식으로 url에 넘어가잖아
+    + 파라미터에 내용이 노출되기 때문에 민감한 데이터 다룰 때 GET 요청하면 안돼
+* default http method라 따로 method 설정 안해주면 get으로 되어 있음
+* wetube에서는 비디오 검색할 때 사용
 
 #### POST
-파일을 보내거나 DB에 있는 값을 바꾸는(수정/삭제) 뭔가를 보낼 때 사용, 로그인 할 때도 사용
+* *수행한다*
+  + 서버 상의 데이터 값이나 상태를 바꿀 때
+  + 리소스를 *생성/업데이트*하기 위해 서버에 데이터를 보내는 데 사용
+    + 전송해야 할 데이터를 *HTTP 메시지의 Body*에 담아서 전송
+    + 그 Body의 타입은 요청 헤더의 Content-Type에 명시
+* 파일을 보내거나 DB에 있는 값을 바꾸는(수정/삭제) 뭔가를 보낼 때 사용, 로그인 할 때도 사용
 
-edit.pug
+* edit.pug
 ```
 form(method="POST")
 ```
 
-하지만 저렇게 선언한다고 해서 우리 서버가 이해하고 있는 거 아니니까 router에도 알려줘야해
-
-videoRouter.js
+* videoRouter.js
+  + 위 edit.pug에 저렇게 선언한다고 해서 우리 서버가 이해하고 있는 거 아니니까 router에도 알려줘야해
 ```
 videoRouter.get("/:id(\\d+)/edit", getEdit);
 videoRouter.post("/:id(\\d+)/edit", postEdit);
 ```
-
-근데 위에서 처럼 두 줄로 쓰지말고 아래처럼 하나로
+  + 근데 위에서 처럼 두 줄로 쓰지말고 아래처럼 하나로 가능
 ```
 videoRouter.route("/:id(\\d+)/edit").get(getEdit).post(postEdit);
 ```
 
 ##### express가 form을 이해하게 하려면
-server.js
+* server.js
+  + router 연결되기 전에 아래 내용 적어야 form의 value를 이해할 수 있음
+  + form을 javascript가 이해할 수 있도록 변환해주는 *middleware*임
 ```
 app.use(express.urlencoded({extended: true}));
 ```
-router 연결되기 전에 적어야 form의 value를 이해할 수 있음
-form을 javascript가 이해할 수 있도록 변환해주는 middleware임
 
-videoController.js의 postEdit 함수
+* videoController.js의 postEdit 함수
 ```
 console.log(req.body);
 ```
 
-그럼 이제 form에 적은 내용이 넘어옴
-form의 name이 title이기 때문에 콘솔창에 데이터가
+* 그럼 이제 form에 적은 내용이 넘어옴
+  + form의 name이 title이기 때문에 콘솔창에 데이터가
 ```
 { title: 'New Video' }
 ```
@@ -364,37 +371,36 @@ export const postEdit = (req, res) => {
   return res.redirect(`/videos/${id}`);
 };
 ```
-- req.params는 router의 "/:id(\\d+)" 를 의미함
-- req.body는 form(edit.pug)에 있는 value의 javascript representation이다.
-req.body에서 데이터보려면 edit.pug에서 input에 꼭 name 넣어줘야해
+* *req.params*는 router의 "/:id(\\d+)" 를 의미함
+* *req.body*는 form(edit.pug)에 있는 value의 javascript representation이다.
+  + req.body에서 데이터보려면 edit.pug에서 _input에 꼭 name 넣어줘야해_
 
 ## #6.7 MongoDB
 
 ### 설명
-- document-based 임 => objects(json like documents)
-- 만약 sql-based 였다면 rdb였겠지 엑셀처럼 column/rows (not flexible)
+* document-based 임 => objects(json like documents)
+* 만약 sql-based 였다면 rdb였겠지 엑셀처럼 column/rows (not flexible)
 
 ### 설치
-https://docs.mongodb.com/manual/installation
+* 참고: <https://docs.mongodb.com/manual/installation>
 
-MongoDB 설치 (MacOS용)
+* MongoDB 설치 (MacOS용)
 1. xcode-select --install
 2. brew tap mongodb/brew
-3. brew install mongodb-community@5.0
+3. brew install mongodb-community@5.0   
 (버전은 추후에 달라질 수 있습니다.)
 
-MongoDB Compass (MongoDB GUI)
-https://www.mongodb.com/products/compass
+* MongoDB Compass (MongoDB GUI): <https://www.mongodb.com/products/compass>
 
 
 ### 설치 확인
-terminal 열어서
+* terminal 열어서
 ```
 $ mongod
 $ mongo
 ```
 
-문제 발생했을 경우
+* 문제 발생했을 경우
 ```
 MongoDB shell version v5.0.0
 connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
@@ -418,7 +424,7 @@ npm i mongoose
 
 ### setting
 - db.js 생성
-- $ mongo 명령어 후 url 가져오기: mongodb://127.0.0.1:27017/
+- ```$ mongo``` 후 url 가져오기: mongodb://127.0.0.1:27017/
 - db.js에 mongoose랑 mongoDB 연결하기
 ```
 import mongoose from "mongoose";
@@ -438,15 +444,18 @@ db.once("open", () => console.log("Connected to DB ✅")); // only one time
 ```
 
 ## #6.8~ CRUD
-Create
-Read
-Update
-Delete
+* 의미
+  + Create
+  + Read
+  + Update
+  + Delete
 
-Video model을 만들거야 (mkdir models > vi Video.js)
-mongoose에게 데이터가 어떻게 생겼는지 가르쳐줘야해
+* Video model을 만들거야
+  + mkdir models > vi Video.js
+  + mongoose에게 데이터가 어떻게 생겼는지 가르쳐줘야해
 
 ### 스키마
+* 데이터 형태 설정
 ```
 const videoSchema = new mongoose.Schema({
   title: String,
@@ -459,16 +468,16 @@ const videoSchema = new mongoose.Schema({
   },
 });
 ```
-데이터 형태가 어떻게 생겼는지 설정한다.
 
 ### 모델 생성
-위에서 생성한 스키마를 기반으로 모델을 생성한다.
+* 위에서 생성한 스키마를 기반으로 모델을 생성한다.
 ```
 const movieModel = mongoose.model("Video", videoSchema); // model 이름을 Video로 함
 export default movieModel; // export
 ```
 
-그리고 필요한 곳에 import 해줘야 함 - 여기서는 server에 했으나 뒤에서 init으로 옮김
+* 그리고 필요한 곳에 import 해줘야 함
+  + 여기서는 server에 했으나 뒤에서 init으로 옮김
 ```
 import "./models/Video";
 ```
@@ -476,10 +485,11 @@ import "./models/Video";
 ## #6.11~ Query
 
 ### server.js와 init.js 분리
-server.js는 express 관련된 것과 server의 configuration에 관련된 내용만 다루고
-init.js는 DB나 model등을 import하는 내용을 담음
+* 역할에 따라 분리
+  + *server.js*: express 관련된 것과 server의 configuration에 관련된 내용만
+  + *init.js*: DB나 model등을 import하는 내용을 담음
 
-init.js
+* init.js
 ```
 import "./db";
 import "./models/Video";
@@ -492,7 +502,8 @@ app.listen(PORT, () => { // create a server
   console.log(`Server listening on http://localhost:${PORT} 🚀`);
 });
 ```
-그리고 nodemon 설정을 위해 server.js를 실행시키는 부분을 init.js로 바꾸기
+
+* 그리고 nodemon 설정을 위해 server.js를 실행시키는 부분을 init.js로 바꾸기
 
 ### Model 사용
 이제 controller에서 fake data(array) 다 지우고
@@ -2622,3 +2633,5 @@ output
 ```
 recorder = new MediaRecorder(stream, {mimeType: "video/mp4"});
 ```
+
+# #14 WEB ASSEMBLY VIDEO TANSCODE
