@@ -2910,3 +2910,38 @@ if messages.success
 <div class="message error"><span>Log in first.</span></div>
 ```
 
+# #16 COMMENT SECTION
+* 동적 댓글 창을 만들자
+* 17에서는 실제 디플로이를 할 거야
+  + assets은 절대 서버에 올리면 안되는데 우리는 올리고 있어
+
+## #16.1 Comment Models
+* 모든 건 데이터로부터 시작한다!
+  + 우리가 지금까지 한 거 최종 복습 시간
+
+* models/Comment.js
+```js
+import mongoose from "mongoose";
+
+const commentSchema = new mongoose.Schema({
+  text: { type:String, required: true },
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref:"User" },
+  video: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Video" },
+  createdAt: { type: Date, required: true, default: Date.now },
+});
+
+const Comment = mongoose.model("Comment", commentSchema);
+
+export default Comment;
+```
+  + 어떤 비디오의 코멘트인지 알기 위해 video id 데이터를 넣는다 -> 즉 비디오는 여러 개의 코멘트를 가진다는 소리
+    + models/Video.js에 아래 내용 추가되어야 함
+    + models/User.js도 마찬가지
+```js
+comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+```
+
+* init.js
+```js
+import "./models/Comment";
+```
