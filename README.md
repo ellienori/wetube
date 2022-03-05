@@ -2773,7 +2773,8 @@ document.body.appendChild(a);
 a.click();
 ```
 
-## #14.3 Thumbnail
+## #14.3~ Thumbnail
+### Thumbnail 작업
 * 영상 screenshot을 찍는 거야
 ```javascript
 await ffmpeg.run("-i", "recording.webm", "-ss", "00:00:01", "-frames:v", "1", "thumbnail.jpg");
@@ -2783,8 +2784,69 @@ await ffmpeg.run("-i", "recording.webm", "-ss", "00:00:01", "-frames:v", "1", "t
   + 해당 내용은 브라우저 메모리에 저장된다.
 
 * 동영상 저장할 때 처럼 파일 읽고 Blop 만들고 URL 만들기
-```
+```javascript
 const thumbFile = ffmpeg.FS("readFile", "thumbnail.jpg");
 const thumbBlop = new Blob([thumbFile.buffer], { type: "image/jpg" });
 const thumbUrl = URL.createObjectURL(thumbBlop);
 ```
+
+* Thumbnail 저장하기
+  + 동영상처럼 똑같이 저장하면 돼
+  + downloadFile이라는 함수를 만들어서 똑같이 저장해줌
+```javascript
+downloadFile(mp4Url, "MyRecording.mp4");
+downloadFile(thumbUrl, "MyThumbnail.jpg");
+```
+
+* Thumbnail 추가하기
+  + Video.js의 스키마에 ThumbUrl 추가
+```javascript
+thumbUrl: { type: String, required: true },
+```
+  + upload.pug에 관련 input 추가 (Video File이랑 똑같이 하면 돼)
+```pug
+label(for="thumb") Thumbnail File 
+input(name="thumb", id="thumb", type="file", accept="image/*", required)
+```
+  + videoRouter.js는 video를 upload 할 준비가 되어 있지만 thumbnail을 업로드 할 준비 X
+    + 기존 video 같은 경우는
+      + middlewares.js에서 uploadVideoMiddleware 라는 이름으로 multer를 사용해.
+      + 그리고 videoRouter.js에서 ```.post(uploadVideoMiddleware.single("video")```로 video를 가져온다.
+    + 그런데 multer는 다행히 single 뿐만 아니라 fileds라고 받고 싶은 파일 이름을 특정 지어서 가져올 수 있어
+```javascript
+.post(uploadVideoMiddleware.fields([
+  {name: "video", maxCount: 1}, {name: "thumb", maxCount: 1},
+])
+```
+  + 그런데 postUpload controller는 req.file을 기다리고 있거든. 이제 *req.files* 써야해.
+```javascript
+const {
+  body: {
+    title, description, hashtags,
+  },
+  files: {
+    video, thumb,
+  },
+  session: {
+    user: {
+      _id,
+    }
+  }
+} = req;
+
+try {
+  const createdVideo = await Video.create({
+    title,
+    description,
+    thumbUrl: thumb[0].path,
+    videoUrl: video[0].path,
+```
+
+  + 이제 섬네일이 보이게 하려면 mixins/video.pug에 thumbUrl로 이미지 출력 한다.
+```pug
+div.video-mixin__thumb(style=`background-image:url(${video.thumbUrl}); background-size: cover; background-position: center`)
+```
+
+### 추가 작업
+* 긴 영상을 업로드하면 변환이 너무 오래 걸리니까 stop 함수 더이상 쓰지 않고 5초 후에 record 종료하게 함
+  + start로 코드 이동
