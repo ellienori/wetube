@@ -2945,3 +2945,51 @@ comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
 ```js
 import "./models/Comment";
 ```
+
+## #16.2 Comment Box
+* frontend
+
+* client/js/commentSection.js
+  + 파일 생성하면 아직 webpack이 인식못하기 때문에 webpack에 넣어줘야해
+    + webpack.confing.js에 ```commentSection: BASE_JS + "/commentSection.js",``` 추가
+    + webpack을 수정하면 재시작해줘야해
+      + assets/commentSection.js가 있다? -> 잘 뜬 거
+  + template과 js 연결해야지
+    + watch.pug에 js 추가
+    + template 내용 추가 (e.g. input form)
+```pug
+if loggedIn
+  div.video__comments
+      form.video__comment-form#commentForm
+          textarea(cols="30", rows="10", placeholder="Write a nice commment...")
+          button Add Comment
+```
+  + js에 함수 추가
+```js
+
+```
+  + form에 있는 버튼을 누르는 순간 form이 제출된다 -> 새로 고침
+    + 그래서 우리는 click event를 감지하는 것 대신에 form의 submit event를 감지해야해
+      + 그리고 default 동작도 막아야 해 -> event.preventDefault();
+      + fetch로 데이터 보낼 때 body에 넣어서 보낸다 (그게 POST method의 특징이잖아)
+      + api url은 apiRouter.js에 추가한다
+
+* apiRouter.js
+```js
+apiRouter.post("/videos/:id([0-9a-f]{24})/comment", createComment);
+```
+  + 위의 내용 추가하려면 videoController에 createComment 함수 있어야 해
+
+* videoController.js
+```js
+export const createComment = (req, res) => {
+  console.log(req.params);
+  console.log(req.body);
+  return res.end();
+};
+```
+  + output
+```bash
+{ id: '622318b6f8ceb9b763bb5fcf' }
+{}
+```
