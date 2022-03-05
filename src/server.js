@@ -24,6 +24,8 @@ app.set("views", process.cwd()+"/src/views");
 // session middleware
 app.use(morgan("dev")); // logger
 app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
 app.use(session({
   secret: process.env.COOKIE_SECRET,
   resave: false,

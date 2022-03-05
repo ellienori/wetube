@@ -2964,9 +2964,23 @@ if loggedIn
           textarea(cols="30", rows="10", placeholder="Write a nice commment...")
           button Add Comment
 ```
-  + js에 함수 추가
+  + commentSection.js에 함수 추가
 ```js
+const videoContainer = document.getElementById("videoContainer");
+const form = document.getElementById("commentForm");
 
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const textarea = form.querySelector("textarea");
+  const text = textarea.value;
+  const videoId = videoContainer.dataset.id;
+  fetch(`/api/videos/${videoId}/comment`, {
+    method: "POST",
+    body: {
+      text,
+    }
+  });
+});
 ```
   + form에 있는 버튼을 누르는 순간 form이 제출된다 -> 새로 고침
     + 그래서 우리는 click event를 감지하는 것 대신에 form의 submit event를 감지해야해
@@ -2992,4 +3006,28 @@ export const createComment = (req, res) => {
 ```bash
 { id: '622318b6f8ceb9b763bb5fcf' }
 {}
+```
+  + 왜 req.body가 넘어오지 않지?
+    + 우리가 form 데이터를 req.body로 넘겨줄 때 form의 데이터를 js가 이해할 수 있도록 ```app.use(express.urlencoded({extended: true}));``` *미들웨어*를 사용했었지
+    + 이번에는 fetch 데이터를 js가 이해할 수 있게 가르쳐야 해
+      + fetch로 받아오는 데이터는 대부분 json이다
+
+* JSON.stringify() 적용
+  + commentSection.js
+```js
+fetch(`/api/videos/${videoId}/comment`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    text,
+  }),
+});
+```
+  + header는 기본적오르 Request에 대한 정보를 담고 있다
+    + content-type에 우리가 지금 *text지만 사실 json 데이터*을 보내고 있다는 걸 알려줘야해 (그래야 미들웨어가 json()을 실행시키지)
+  + stringify를 써서 String으로 변환된 데이터를 넘기면 -> *미들웨어*가 string을 json으로 변환시켜준다.
+```js
+app.use(express.json());
 ```
