@@ -2738,6 +2738,7 @@ app.use((req, res, next) => {
 ```javascript
 const mp4File = ffmpeg.FS("readFile", "output.mp4");
 ```
+  + FS == File System
 
 * 그러나 위에서 받아온 mp4File은 그냥 array라 할 수 있는 게 없어 -> Blob을 만들자
 ```javascript
@@ -2770,4 +2771,20 @@ a.href = mp4Url;
 a.download = "MyRecording.mp4";
 document.body.appendChild(a);
 a.click();
+```
+
+## #14.3 Thumbnail
+* 영상 screenshot을 찍는 거야
+```javascript
+await ffmpeg.run("-i", "recording.webm", "-ss", "00:00:01", "-frames:v", "1", "thumbnail.jpg");
+```
+  + -ss: 특정 시간대로 이동
+  + -frames:v 1: 한장의 스크린샷 프레임
+  + 해당 내용은 브라우저 메모리에 저장된다.
+
+* 동영상 저장할 때 처럼 파일 읽고 Blop 만들고 URL 만들기
+```
+const thumbFile = ffmpeg.FS("readFile", "thumbnail.jpg");
+const thumbBlop = new Blob([thumbFile.buffer], { type: "image/jpg" });
+const thumbUrl = URL.createObjectURL(thumbBlop);
 ```
