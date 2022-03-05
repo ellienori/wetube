@@ -2635,3 +2635,139 @@ recorder = new MediaRecorder(stream, {mimeType: "video/mp4"});
 ```
 
 # #14 WEB ASSEMBLY VIDEO TANSCODE
+*FFmpeg*
+* 얘로 뭘 할 거 냐면
+  + webm -> mp4로 변환
+  + 비디오 썸네일 추출
+
+* 얘가 뭔데?
+  + 비디오/오디오 같은 미디어 파일 다룰 수 있어
+    + 비디오 압축, 비디오에서 오디오 추출, 비디오 화면 캡쳐 등 모든 것들!
+
+* 백엔드에서 실핼해야해
+  + 그런데 누가 1기가 비디오를 업로드하고 내가 그걸 변환해야 한다면? 백엔드 성능이 엄청 좋아야해 -> 비싸
+  + 그러니까 Webassembly를 써야 해
+
+*Webassemly*
+* 개발형 표준
+  + 기본적으로 웹사이트가 매우 빠른 코드를 실행할 수 있게 함
+  + 프론트에서는 세 종류의 코드만 사용할 수 있다
+    + HTML / CSS / JS
+  + Webassembly는 JS를 쓰지 않고 다른 종류의 프로그램을 사용해서 프론트엔드에서 매우 빠른 코드를 실행할 수 있어
+
+*우리의 설계*
+* 유투브는 업로드 된 비디오를 그들의 비싼 서버에서 변환할 거야
+* 우리는 사용자의 브라우저에서 비디오를 변환할거야 -> webassembly를 사용해서 브라우저에서 FFmpeg를 돌릴 거야.
+
+*설치*
+* ffmpeg.wasm (wasm? webassembly라는 뜻)
+  + 참고: <https://github.com/ffmpegwasm/ffmpeg.wasm>
+```
+npm install @ffmpeg/ffmpeg @ffmpeg/core
+```
+
+## #14.1 Transcode Video
+* URL
+  + 녹화를 종료하면 영상의 모든 정보를 가진 object url이 생성된다 (recorder.js)
+  ```videoFile = URL.createObjectURL(event.data);```
+
+* 사용자가 download 버튼을 누르면 영상을 불러서 변환 할 예정
+
+### 1단계
+* import 후 ffmpeg instance를 생성, load 해야 해
+```
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+
+const ffmpeg = createFFmpeg({log: true});
+await ffmpeg.load();
+```
+* 왜 load할 때 await 하지? 
+  + 사용자가 *software*를 사용하기 때문! js가 아닌 코드를 사용하기 위해 무언가를 설치해야하기 때문에
+  + 우리 웹사이트에서 다른 소프트웨어를 사용하기 때문, 그런데 그 소프트웨어가 무거울 수 있다
+  + 그런데 우리 서버에서 하는 거 아니고 유저의 브라우저에서 처리하기 때문에 컴퓨팅 파워 신경 쓸 필요는 없다
+
+### 2단계
+* 눈을 감고 우리가 브라우저 안에 있다는 생각을 멈춰 -> 우리는 폴더와 파일로 가득 찬 컴퓨터 안에 있다.
+* ffmpeg에 파일 생성하기
+  + backend에서는 multer가 파일을 생성함 (avatar, videos, ..)
+```javascript
+ffmpeg.FS("writeFile", "recording.webm", await fetchFile(videoFile));
+```
++ method name, file name, binary data
+  + FS안에 넣을 수 있는 method name은 3가지
+    + readFile
+    + unlink
+    + writeFile: ffmpeg의 가상 세계에 파일 생성
+
+* 파일 변환
+```javascript
+await ffmpeg.run("-i", "recording.webm", "-r", "60", "output.mp4");
+```
++ 명령어, input file name, output file name
+  + -i: input
+  + 우리가 이미 위에 "recording.webm"를 만들었기 때문에 (FS 명령어로) 여기서 쓸 수 있는 거야
+  + -r 60: 초당 60프레임으로 인코딩
+
+### 온갖 에러 핸들링
+* ffmpeg core 404 error
+  + 해당 모듈의 경로를 express statc 처리해주고 ffmpeg instance 생성할 때 corePath를 임의로 지정
+```javascript
+// server.js
+app.use("/static", express.static("node_modules/@ffmpeg/core/dist"));
+
+// recorder.js
+const ffmpeg = createFFmpeg({
+  corePath: "/static/ffmpeg-core.js",
+  log: true
+});
+```
+
+* 그다음 무슨 promise error는 server.js에서
+```javascript
+// ffmpeg.wasm을 사용하기 위해 corss-origin- 어쩌구를 위함
+app.use((req, res, next) => {
+  res.header("Cross-Origin-Embedder-Policy", "require-corp");
+  res.header("Cross-Origin-Opener-Policy", "same-origin");
+  next();
+});
+```
+
+## #14.2 Download Transcoded Video
+* 우리가 14.1에서 받은 output.mp4는 *브라우저 메모리*에 있다.
+  + 우선 이 파일을 다시 불러와야 해
+```javascript
+const mp4File = ffmpeg.FS("readFile", "output.mp4");
+```
+
+* 그러나 위에서 받아온 mp4File은 그냥 array라 할 수 있는 게 없어 -> Blob을 만들자
+```javascript
+const mp4File = ffmpeg.FS("readFile", "output.mp4");
+const mp4Blop = new Blob([mp4File.buffer], { type: "video/mp4" });
+const mp4Url = URL.createObjectURL(mp4Blop);
+```
+  + Blob? JS 세계의 파일. 파일 같은 객체
+    + recording start할 때 생성한 videoFile에 들어가는 event.data도 Blob임
+    + 거기서도 event.data로 URL생성함
+  + video file에 접근하고 싶으면 buffer를 사용해야해
+    + binary data를 사용하고 싶으면 buffer 사용하기
+  + Blob 만들 때 배열 안에 배열
+    + 만들고나서 JS에게 mp4 type이라는 걸 알려줘야해
+
+* 저장하는 내용 수정
+  + Before
+```javascript
+const a = document.createElement("a");
+a.href = videoFile;
+a.download = "MyRecording.webm";
+document.body.appendChild(a);
+a.click();
+```
+
+  + After
+```javascript
+const a = document.createElement("a");
+a.href = mp4Url;
+a.download = "MyRecording.mp4";
+document.body.appendChild(a);
+a.click();
+```
