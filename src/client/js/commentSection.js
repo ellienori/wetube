@@ -18,4 +18,5 @@ form.addEventListener("submit", (event) => {
       text,
     }),
   });
+  textarea.value = "";
 });
