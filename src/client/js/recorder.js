@@ -33,7 +33,7 @@ const handleRecordStart = () => {
     video.play();
 
     // stop
-    recordBtn.innerText = "Downloading";
+    recordBtn.innerText = "Download";
     recordBtn.disabled = false;
     recordBtn.addEventListener("click", handleRecordDownload);
   };

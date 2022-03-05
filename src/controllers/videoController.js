@@ -33,6 +33,7 @@ export const getEdit = async (req, res) => {
   }
 
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized.");
     return res.status(403).redirect("/"); // 403: Forbidden
   }
   return res.render("videos/edit", { pageTitle: `✂ ${video.title}`, video });
@@ -53,6 +54,7 @@ export const postEdit = async (req, res) => {
     return res.status(404).render("404", { pageTitle: "Video Not Found." })
   }
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized.");
     return res.status(403).redirect("/"); // 403: Forbidden
   }
 
@@ -61,6 +63,7 @@ export const postEdit = async (req, res) => {
     description,
     hashtags: Video.formatHashtags(hashtags),
   });
+  req.flash("success", "Change saved.");
   return res.redirect(`/videos/${id}`);
 };
 
@@ -119,6 +122,7 @@ export const deleteVideo = async (req, res) => {
     return res.status(404).render("404", { pageTitle: "Video Not Found." })
   }
   if (String(video.owner) !== String(_id)) {
+    req.flash("error", "Not authorized.");
     return res.status(403).redirect("/"); // 403: Forbidden
   }
   await Video.findByIdAndDelete(id);

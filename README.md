@@ -2850,3 +2850,63 @@ div.video-mixin__thumb(style=`background-image:url(${video.thumbUrl}); backgroun
 ### 추가 작업
 * 긴 영상을 업로드하면 변환이 너무 오래 걸리니까 stop 함수 더이상 쓰지 않고 5초 후에 record 종료하게 함
   + start로 코드 이동
+
+* styles
+
+# #15~ FLASH MESSAGES
+* 사용자에게 메시지를 전달하고 싶다.
+  + 이미 로그인했는데 로그인페이지로 오면 우리가 "/"으로 redirect하는데 적어도 이유는 알려줘야지
+
+* *express-flash*
+  + 사용자에게 flash message를 남길 수 있게 함
+  + 템플릿에 메시지를 남길 수 있게 해주는 미들웨어 Middleware
+    + this message is based-on *session*, so private.
+
+* 설치
+```npm i express-flash```
+
+* 설정
+  + server.js
+```javascript
+import flash from "express-flash";
+
+// flash message
+app.use(flash());
+```
+  + 이제 이 flash()가 session에 연결해서 사용자에게 메시지를 넘길거야
+  + 이걸 연결한 순간부터 우리는 *req.flash()*라는 함수를 쓸 수 있어
+
+* 메시지 생성
+  + middlewares.js나 video 혹은 user controller(redirect)에 추가
+    + 메시지 타입, 메시지 내용
+```javascript
+req.flash("error", "Not authorized.");
+```
+
+* 메시지 보여주기
+  + 우리가 flash 미들웨어를 설치 + 사용하면 우리를 위해 *messages locals*를 만들어준다
+    + 즉 pug에서 messages.error 혹은 messages.info 이렇게 내용을 가져올 수 있음
+  + 이 메시지는 한 번 보여지고 나면 express가 메시지를 cache에서 지워버림
+    + mixins/message.pug로 만들 거야
+```pug
+mixin message(kind,text)
+  div.message(class=kind)
+    span=text
+```
+    + base.pug
+```pug
+include mixins/message
+//(생략)
+if messages.error
+  +message("error", messages.error)
+if messages.info
+  +message("info", messages.info)
+if messages.success 
+  +message("success", messages.success)
+```
+  + 그러면 element에 아래처럼 추가 된다
+    + 즉 css에서 message class에 css를 추가할 수 있다는 뜻
+```js
+<div class="message error"><span>Log in first.</span></div>
+```
+
