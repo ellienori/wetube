@@ -3031,3 +3031,34 @@ fetch(`/api/videos/${videoId}/comment`, {
 ```js
 app.use(express.json());
 ```
+
+## #16.6 Rendering Comments
+* 우리가 코멘트를 작성했는데 db데이터의 comments는 비어 있어
+  + 코멘트 생성하고 나서 비디오에 comment id 넣고 user에도 comment id 넣어준다음 db 업데이트 해야해
+```js
+video.comments.push(comment._id);
+user.comments.push(comment._id);
+video.save();
+user.save();
+```
+
+* 댓글 출력하기
+  + videoController.js의 watch에 *populate* 추가
+```js
+const video = await Video.findById(id).populate("owner").populate("comments");
+```
+  + watch에 댓글 view 추가
+
+* 실시간처럼 보이기
+  + *form submit handler를 async로 만들고 fetch를 await* 한 다음 ```window.location.reload();```하면 실시간처럼 보임
+  + 근데 reload하면 전체 새로고침이라 매번 db에 가서 데이터 가져오는 거임 그래서 이 방법은 안쓸거야
+
+## #16.7 Realtime Comments
+* 우리가 댓글을 써서 submit되면 -> fetch -> backend로 넘어가서 (videoController.js) 작업
+  + 그런데 backend에서 status를 404 줄 때도 있고 201 줄 때도 있잖아
+  + 그래서 fetch 함수에서는 ```Promise<response>```를 리턴한다
+
+* 우리가 댓글을 뿌릴 때 pug에서 뿌리는데
+  + 새로 추가된 댓글을 js로 commentSection.js에서 바로 뿌려주면 새로고침 안해도 돼
+  + *addComment()*라는 함수 만들어서 실행시킴
+    + *prepend()*는 맨 위에 붙여준다. append()는 맨 뒤에 붙여줌
