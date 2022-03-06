@@ -3062,3 +3062,18 @@ const video = await Video.findById(id).populate("owner").populate("comments");
   + 새로 추가된 댓글을 js로 commentSection.js에서 바로 뿌려주면 새로고침 안해도 돼
   + *addComment()*라는 함수 만들어서 실행시킴
     + *prepend()*는 맨 위에 붙여준다. append()는 맨 뒤에 붙여줌
+
+## #16.8 Comments Ids
+* 댓글을 지우려면 comment id가 필요해서 backend에서 넘겨주자
+```js
+return res.status(201).json({newCommentId: comment._id}); // Created
+```
+
+* 그러면 frontend js에서는 이렇게 받아온다
+```js
+if (response.status === 201) {
+  textarea.value = "";
+  const {newCommentId} = await response.json();
+  addComment(text, newCommentId);
+}
+```
