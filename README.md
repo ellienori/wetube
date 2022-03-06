@@ -3125,3 +3125,27 @@ $ npm run build:server
 ReferenceError: regeneratorRuntime is not defined
 ```
   + 해결: init.js에 ```import "regenerator-runtime";``` 추가
+
+
+## #17.2 Building the frontend
+* Webpack은 2가지 모드가 있다 - development / production
+  + production은 코드가 훨씬 작다
+
+* 그래서 assets을 빌드하고 싶어
+```json
+"build:assets": "webpack --mode=production",
+```
+  + ```npm run build:assets```을 했을 경우 production 모드로 진입해서 js들이 모두 한줄씩 압축됨
+  + 하지만 여전히 watch mode에 있어 (파일이 수정되는지 안되는지 지켜보고 있어)
+    + 그래서 watch: true를 webpack.config.js에서 지우고 script에 추가할 거야
+```json
+"dev:assets": "webpack --mode=development -w"
+```
+
+* frontend를 빌드하고 나서 server를 다시 새로 빌드하자
+  + server 빌드할 때 src를 타겟으로 하잖아
+  + 그 안에 client가 있기 때문에 새로 빌드하는 건가 (;)
+```json
+"start": "node build/init.js",
+"build": "npm run build:server && npm run build:assets",
+```
