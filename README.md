@@ -1,6 +1,9 @@
 # This is a study notion.
 * <https://gist.github.com/ihoneymon/652be052a0727ad59601>
-# Set up
+# #1 INTRODUCTION => Set up
+* Nodejs?
+  + js 엔진으로 빌드 된 js runtime
+  + 브라우저 밖에서 돌아가는 JS
 
 ## package.json
 
@@ -3077,3 +3080,48 @@ if (response.status === 201) {
   addComment(text, newCommentId);
 }
 ```
+
+# #17 DEPLOYMENT
+* 지금은 우리 로컬호스트에 올라가있어서 우리만 볼 수 있다
+
+## #17.0 Building the Backend
+* 우리가 만든 코드를 실행하려면 nodemon -> babel-node 임
+  + 그런데 babel-node는 개발용임
+    + 그렇게 빠르지 않음 (Performance)
+  + 그래서 일반적인 js 코드로 바꿔야 해
+
+* 우리는 __Babel CLI__ 을 사용해서 백엔드를 바꿀 거야
+
+### Babel CLI
+#### 설치
+```bash
+npm i -D @babel/core @babel/cli
+```
+
+#### 설정
+* package.json에 스크립트 추가
+```json
+"build:server": "babel src -d build",
+```
+  + babel 다음에 바로 target
+  + ```-d```는 output이 어디에 생길지 디렉토리를 지정하는 거야
+
+#### 사용
+```bash
+$ npm run build:server
+```
+* build 디렉토리가 생김 -> git에 올리지 않도록 .gitignore에 추가할 것
+  + 안에 있는 내용들은 모두 js 호환 코드
+
+* 스크립트 추가
+```json
+"start": "node build/init.js",
+```
+  + ```$ npm run start```하면 build/init.js 실행
+
+* 에러발생!
+  + async/await
+```bash
+ReferenceError: regeneratorRuntime is not defined
+```
+  + 해결: init.js에 ```import "regenerator-runtime";``` 추가
